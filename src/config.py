@@ -23,7 +23,7 @@ class Config:
     
     # Bot configuration
     BOT_HANDLE: str = os.getenv("BOT_HANDLE", "crybbmaker")
-    POLL_SECONDS: int = int(os.getenv("POLL_SECONDS", "15"))
+    POLL_SECONDS: int = int(os.getenv("POLL_SECONDS", "30"))
     WATERMARK_TEXT: Optional[str] = os.getenv("WATERMARK_TEXT", "made by @crybbmaker")
     PORT: int = int(os.getenv("PORT", "8000"))
     TWITTER_MODE: str = os.getenv("TWITTER_MODE", "live")  # live | dryrun | mock

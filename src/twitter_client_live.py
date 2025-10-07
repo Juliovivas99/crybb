@@ -1,6 +1,7 @@
 """
 Live Twitter client using Tweepy API.
 """
+import io
 import json
 import os
 import time
@@ -52,16 +53,16 @@ class TwitterClientLive:
             if not me or not me.data:
                 return []
             
-            params = {
-                "max_results": 10,
-                "tweet.fields": "created_at,author_id"
-            }
-            if since_id:
-                params["since_id"] = since_id
+            bot_id = me.data.id
             
+            # Fixed: use snake_case params and include entities expansion
             response = self.v2_client.get_users_mentions(
-                me.data.id,
-                **params
+                id=bot_id,
+                since_id=since_id,
+                max_results=10,
+                expansions=["author_id", "entities.mentions.username"],
+                user_fields=["username", "profile_image_url"],
+                tweet_fields=["created_at", "entities"]
             )
             
             return response.data if response and response.data else []
@@ -77,11 +78,12 @@ class TwitterClientLive:
                 user_fields=["profile_image_url", "name", "username"]
             )
             if response and response.data:
+                profile_url = getattr(response.data, "profile_image_url", None)
                 return {
                     "id": str(response.data.id),
                     "username": response.data.username,
                     "name": response.data.name,
-                    "profile_image_url": getattr(response.data, "profile_image_url", None)
+                    "profile_image_url": profile_url
                 }
         except Exception as e:
             print(f"Error getting user by ID {user_id}: {e}")
@@ -96,11 +98,12 @@ class TwitterClientLive:
                 user_fields=["profile_image_url", "name", "username"]
             )
             if response and response.data:
+                profile_url = getattr(response.data, "profile_image_url", None)
                 return {
                     "id": str(response.data.id),
                     "username": response.data.username,
                     "name": response.data.name,
-                    "profile_image_url": getattr(response.data, "profile_image_url", None)
+                    "profile_image_url": profile_url
                 }
         except Exception as e:
             print(f"Error getting user by username {username}: {e}")
@@ -117,23 +120,36 @@ class TwitterClientLive:
             print(f"Error downloading image from {url}: {e}")
             return None
     
-    def reply_with_image(self, tweet_id: str, text: str, image_bytes: bytes) -> None:
+    def reply_with_image(self, in_reply_to_tweet_id: str, text: str, image_bytes: bytes) -> None:
         """Reply with image using Twitter API."""
         try:
-            # Upload media
+            print(f"Uploading media: {len(image_bytes)} bytes")
+            
+            # Fixed: wrap bytes in BytesIO
+            buf = io.BytesIO(image_bytes)
+            buf.seek(0)
+
             media = self.v1_client.media_upload(
-                filename="reply.jpg",
-                file=image_bytes
+                filename="crybb.jpg",
+                file=buf
             )
+            media_id = getattr(media, "media_id", None) or getattr(media, "media_id_string", None)
+
+            # Try both media_ids formats for compatibility
+            try:
+                self.v2_client.create_tweet(
+                    text=text,
+                    in_reply_to_tweet_id=in_reply_to_tweet_id,
+                    media_ids=[media_id]
+                )
+            except TypeError:
+                self.v2_client.create_tweet(
+                    text=text,
+                    in_reply_to_tweet_id=in_reply_to_tweet_id,
+                    media={"media_ids": [media_id]}
+                )
             
-            # Post reply
-            self.v2_client.create_tweet(
-                text=text,
-                media_ids=[media.media_id],
-                in_reply_to_tweet_id=tweet_id
-            )
-            
-            print(f"Successfully replied to tweet {tweet_id}")
+            print(f"Successfully replied to tweet {in_reply_to_tweet_id}")
         except Exception as e:
-            print(f"Error replying to tweet {tweet_id}: {e}")
+            print(f"Error replying to tweet {in_reply_to_tweet_id}: {e}")
             raise

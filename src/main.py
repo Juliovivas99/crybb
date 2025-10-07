@@ -12,7 +12,8 @@ from .image_processor import ImageProcessor
 from .rate_limiter import RateLimiter
 from .storage import Storage
 from .utils import (
-    extract_target_username,
+    extract_target_after_bot,
+    normalize_pfp_url,
     format_friendly_message,
     format_rate_limit_message,
     format_error_message
@@ -54,26 +55,19 @@ class CryBBBot:
                 )
                 return
             
-            # Extract target username
-            target_username = extract_target_username(tweet_text, self.bot_handle)
-            if not target_username:
-                # Fallback to author's username via client
-                try:
-                    user = self.twitter_client.get_user_by_id(int(author_id))
-                    if user and user.get("username"):
-                        target_username = user["username"]
-                except Exception:
-                    target_username = None
+            # Get author username for fallback
+            author = self.twitter_client.get_user_by_id(int(author_id))
+            author_username = author.get("username") if author else None
             
-            # Get profile image URL
-            if target_username:
-                user = self.twitter_client.get_user_by_username(target_username)
-                profile_url = user.get("profile_image_url") if user else None
-            else:
-                profile_url = None
+            # Extract target using new robust method
+            target_username = extract_target_after_bot(tweet, Config.BOT_HANDLE, author_username or "")
             
-            if not profile_url:
-                print(f"Could not fetch profile image for @{target_username}")
+            print(f"Target chosen: @{target_username}")
+            
+            # Get target user and profile image
+            target_user = self.twitter_client.get_user_by_username(target_username)
+            if not target_user:
+                print(f"Could not fetch user @{target_username}")
                 self.twitter_client.reply_with_image(
                     tweet_id,
                     format_error_message(),
@@ -81,10 +75,11 @@ class CryBBBot:
                 )
                 return
             
-            # Download profile image
-            image_bytes = self.twitter_client.download_bytes(profile_url)
-            if not image_bytes:
-                print(f"Could not download image from {profile_url}")
+            pfp_url = normalize_pfp_url(target_user.get("profile_image_url") or "")
+            print(f"PFP={pfp_url}")
+            
+            if not pfp_url:
+                print(f"No profile image URL for @{target_username}")
                 self.twitter_client.reply_with_image(
                     tweet_id,
                     format_error_message(),
@@ -92,15 +87,15 @@ class CryBBBot:
                 )
                 return
             
-            # Generate image via AI orchestrator (fallbacks to placeholder)
-            processed_image = self.orchestrator.render(
-                pfp_url=profile_url,
-                mention_text=tweet_text or "",
+            # Generate image with [style, target_pfp] order
+            image_bytes = self.orchestrator.render_with_urls(
+                [Config.CRYBB_STYLE_URL, pfp_url],
+                mention_text=tweet_text or ""
             )
             
             # Reply with processed image
-            reply_text = format_friendly_message(target_username)
-            self.twitter_client.reply_with_image(tweet_id, reply_text, processed_image)
+            reply_text = f"Here's your CryBB PFP @{target_username} 🍼"
+            self.twitter_client.reply_with_image(tweet_id, reply_text, image_bytes)
             
             print(f"Successfully processed mention {tweet_id}")
             
@@ -138,6 +133,7 @@ class CryBBBot:
     def run_polling_loop(self) -> None:
         """Run the main polling loop."""
         since_id = self.storage.read_since_id()
+        backoff_seconds = 1
         
         while True:
             try:
@@ -156,6 +152,8 @@ class CryBBBot:
                     
                     # Save since_id
                     self.storage.write_since_id(since_id)
+                    # Reset backoff on successful processing
+                    backoff_seconds = 1
                 else:
                     print("No new mentions found")
                 
@@ -164,8 +162,10 @@ class CryBBBot:
                 
             except tweepy.TooManyRequests as e:
                 print(f"Rate limited: {e}")
-                # Wait longer on rate limit
-                time.sleep(300)  # 5 minutes
+                # Exponential backoff with cap
+                backoff_seconds = min(backoff_seconds * 2, 300)  # Cap at 5 minutes
+                print(f"Backing off for {backoff_seconds} seconds")
+                time.sleep(backoff_seconds)
                 
             except Exception as e:
                 print(f"Error in polling loop: {e}")
