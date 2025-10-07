@@ -1,0 +1,102 @@
+{
+  "timestamp": "2025-10-07T17:38:11",
+  "mode": "live",
+  "git_sha": null,
+  "results": [
+    {
+      "name": "Environment / Config",
+      "status": "PASS",
+      "details": "All required env present",
+      "evidence": {
+        "TWITTER_MODE": "live",
+        "POLL_SECONDS": 15,
+        "HTTP_TIMEOUT_SECS": 10
+      }
+    },
+    {
+      "name": "Dependencies",
+      "status": "PASS",
+      "details": "Dependencies status recorded",
+      "evidence": {
+        "Pillow": "present",
+        "tweepy": "present",
+        "tenacity": "present"
+      }
+    },
+    {
+      "name": "Image Pipeline",
+      "status": "PASS",
+      "details": "Rendered 28736 bytes",
+      "evidence": {
+        "input": "/Users/juliovivas/Vscode/crybb/reports/artifacts/pipeline_input.jpg",
+        "output": "/Users/juliovivas/Vscode/crybb/reports/artifacts/pipeline_output.jpg"
+      }
+    },
+    {
+      "name": "AI Pipeline (nano-banana)",
+      "status": "PASS",
+      "details": "bytes=104665",
+      "evidence": {
+        "output": "/Users/juliovivas/Vscode/crybb/reports/artifacts/ai_sample.jpg"
+      }
+    },
+    {
+      "name": "Author Fallback",
+      "status": "FAIL",
+      "details": "simulate_once non-zero exit: 1\nTraceback (most recent call last):\n  File \"/Users/juliovivas/Vscode/crybb/tools/simulate_once.py\", line 18, in <module>\n    from src.twitter_factory import make_twitter_client\n  File \"/Users/juliovivas/Vscode/crybb/src/twitter_factory.py\", line 5, in <module>\n    from .twitter_client_live import TwitterClientLive\nModuleNotFoundError: No module named 'src.twitter_client_live'\n",
+      "evidence": {}
+    },
+    {
+      "name": "Rate Limiter",
+      "status": "PASS",
+      "details": "Denied on 6th request as expected",
+      "evidence": {}
+    },
+    {
+      "name": "Since_ID Persistence",
+      "status": "PASS",
+      "details": "since_id persisted",
+      "evidence": {}
+    },
+    {
+      "name": "Twitter Probe",
+      "status": "FAIL",
+      "details": "Probe failed",
+      "evidence": {
+        "output": "[PASS] AUTH get_me: @crybbmaker (id=1974978317515382784)\n[FAIL] READ mentions: 400 Bad Request\nThe `max_results` query parameter value [5] is not between 10 and 100\n[PASS] LOOKUP user @crybbmaker: profile_image_url=present\n[PASS] DOWNLOAD PFP: 18136 bytes\n[PASS] MEDIA UPLOAD: media_id=1975677058777858048\n\n=== SUMMARY ===\nAUTH:[ok] READ:[fail] MEDIA_UPLOAD:[ok]"
+      }
+    },
+    {
+      "name": "Outbox / No-Post Result",
+      "status": "SKIP",
+      "details": "Only applicable to mock/dryrun modes",
+      "evidence": {}
+    },
+    {
+      "name": "Health Server",
+      "status": "SKIP",
+      "details": "Server not running on http://127.0.0.1:8000",
+      "evidence": {}
+    },
+    {
+      "name": "Dockerfile / Healthcheck",
+      "status": "SKIP",
+      "details": "No HEALTHCHECK found; consider adding one",
+      "evidence": {}
+    }
+  ],
+  "artifacts": [
+    {
+      "label": "input",
+      "path": "reports/artifacts/pipeline_input.jpg"
+    },
+    {
+      "label": "output",
+      "path": "reports/artifacts/pipeline_output.jpg"
+    },
+    {
+      "label": "output",
+      "path": "reports/artifacts/ai_sample.jpg"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+# Suggested .dockerignore
+tests/
+reports/
+fixtures/images/
+outbox/
+.data/
+*.md
+.git/
+.venv/
+__pycache__/
