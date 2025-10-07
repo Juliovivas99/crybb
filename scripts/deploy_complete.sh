@@ -9,7 +9,7 @@ DROPLET_IP="${1:-}"
 APP_DIR="/opt/crybb-bot"
 SERVICE_NAME="crybb-bot"
 DEPLOY_USER="crybb"
-REPO_URL="https://github.com/YOURUSERNAME/crybb.git"  # Update this with your actual repo URL
+REPO_URL="https://github.com/Juliovivas99/crybb.git"
 
 # Colors for output
 RED='\033[0;31m'
