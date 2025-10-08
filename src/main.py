@@ -4,6 +4,7 @@ Handles mention polling, processing, and replying.
 """
 import time
 import threading
+import logging
 import tweepy
 from typing import Optional
 from .config import Config
@@ -190,13 +191,21 @@ class CryBBBot:
 
 def main():
     """Main entry point."""
+    # Setup logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+    logger = logging.getLogger("crybb.main")
+    
     try:
+        logger.info("Boot: env loaded, proceeding with pipeline init")
         bot = CryBBBot()
         bot.start()
     except KeyboardInterrupt:
-        print("Bot stopped by user")
+        logger.info("Bot stopped by user")
     except Exception as e:
-        print(f"Fatal error: {e}")
+        logger.error(f"Fatal error: {e}")
         raise
 
 if __name__ == "__main__":

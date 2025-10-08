@@ -149,6 +149,8 @@ make test
    sudo chmod 600 /opt/crybb-bot/.env
    ```
 
+   **Important:** The `.env` file must be located at `/opt/crybb-bot/.env` on the droplet. The systemd service reads it via `EnvironmentFile=/opt/crybb-bot/.env`.
+
 4. **Run security hardening:**
    ```bash
    chmod +x scripts/harden.sh
@@ -176,7 +178,28 @@ sudo systemctl stop crybb-bot
 sudo systemctl start crybb-bot
 ```
 
-### 4. Updates
+### 4. Verify Configuration
+
+After deployment, verify that your environment variables are loaded correctly:
+
+```bash
+# Check service logs for configuration status
+journalctl -u crybb-bot -f | grep -E "CONFIG:|Boot:"
+
+# Expected output should show:
+# CONFIG: IMAGE_PIPELINE=ai
+# CONFIG: CRYBB_STYLE_URL=https://crybb-assets-...crybb.jpeg
+# CONFIG: REPLICATE_API_TOKEN=r8_...
+# CONFIG: AI pipeline validation passed
+# Boot: env loaded, proceeding with pipeline init
+```
+
+If you see `<missing>` for `CRYBB_STYLE_URL`, the `.env` file is not being loaded properly. Check:
+
+- File exists: `ls -la /opt/crybb-bot/.env`
+- Service configuration: `systemctl cat crybb-bot | grep EnvironmentFile`
+
+### 5. Updates
 
 To update the bot with new code:
 
