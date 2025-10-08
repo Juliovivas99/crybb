@@ -67,7 +67,6 @@ IMAGE_PIPELINE=ai
 CRYBB_STYLE_URL=https://crybb-assets-p55s0u52l-juliovivas99s-projects.vercel.app/crybb.jpeg
 
 # Optional
-WATERMARK_TEXT=
 ```
 
 ### Step 2: Test Locally (Debug Mode)

@@ -93,7 +93,6 @@ ACCESS_SECRET=your_access_secret
 BEARER_TOKEN=your_bearer_token
 BOT_HANDLE=crybbmaker
 POLL_SECONDS=15
-WATERMARK_TEXT=made by @crybbmaker
 PORT=8000
 ```
 
@@ -353,7 +352,6 @@ Test overlay placement and styling without Twitter API:
 - `--smart-placement auto|on|off` - Use OpenCV for face detection
 - `--scale 0.60` - Overlay scale factor (0-1)
 - `--y-factor 0.35` - Vertical position (0-1)
-- `--watermark "text"` - Watermark text (empty disables)
 
 ### Smart Placement
 
@@ -382,7 +380,6 @@ The codebase is designed for easy extension:
 - [ ] Redis/SQLite storage for production
 - [ ] Webhook ingestion (Account Activity API)
 - [ ] Multiple overlay support
-- [ ] Custom watermark positioning
 
 ## Troubleshooting
 
