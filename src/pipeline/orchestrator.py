@@ -9,7 +9,7 @@ def render_placeholder_bytes(pfp_url: str, cfg) -> bytes:
     r = requests.get(pfp_url, timeout=cfg.HTTP_TIMEOUT_SECS)
     r.raise_for_status()
     img_bytes = r.content
-    return ImageProcessor().render(img_bytes, watermark=cfg.WATERMARK_TEXT)
+    return ImageProcessor().render(img_bytes)
 
 
 class Orchestrator:
