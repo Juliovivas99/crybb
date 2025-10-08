@@ -61,6 +61,7 @@ def run_nano_banana(*, prompt: str, image_urls: List[str], cfg) -> bytes:
         raise ValueError(f"[AI] BAD_URL {pfp_url}")
     
     # Hardcode the CryBB constants
+    CRYBB_STYLE_URL = "https://crybb-assets.vercel.app/crybb.jpeg"
     CRYBB_PROMPT = "change the clothes of the first character to the clothes of the character in the second image, if needed change his hair color, skin color, eyes color and tattoos in case they are different from the original image. keep the style consistent to the one in the first image.\nVERY IMPORTANT, always keep the tears\n"
 
     # Try different schemas in order
@@ -107,8 +108,18 @@ def run_nano_banana(*, prompt: str, image_urls: List[str], cfg) -> bytes:
             # Use Replicate SDK with current schema
             output = replicate.run("google/nano-banana", **schema)
             
-            # Get the image bytes
-            image_bytes = output.read()
+            # Get the image bytes - handle both file objects and URLs
+            if hasattr(output, 'read'):
+                image_bytes = output.read()
+            elif isinstance(output, str):
+                # If it's a URL, download it
+                import requests
+                response = requests.get(output)
+                response.raise_for_status()
+                image_bytes = response.content
+            else:
+                raise ValueError(f"Unexpected output type: {type(output)}")
+            
             print(f"[AI] completed bytes={len(image_bytes)}")
             return image_bytes
             
