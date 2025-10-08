@@ -25,10 +25,11 @@ def _post_prediction(*, model: str, token: str, prompt: str, image_urls: List[st
         "Content-Type": "application/json",
     }
     payload = {
-        "version": model,
+        "version": model,  # Keep this as is
         "input": {
             "prompt": prompt,
-            "image": image_urls,
+            "image_input": image_urls,  # ← Change from "image" to "image_input"
+            "aspect_ratio": "match_input_image",  # ← Add this parameter
             "output_format": "jpg",
         },
     }
