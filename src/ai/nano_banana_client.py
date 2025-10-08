@@ -65,7 +65,21 @@ def run_nano_banana(*, prompt: str, image_urls: List[str], cfg) -> bytes:
     # Replicate expects a model version id for \"version\"; allow passing full slug in env
     model = cfg.REPLICATE_MODEL
 
-    created = _post_prediction(model=model, token=token, prompt=prompt, image_urls=image_urls)
+    # Hardcode the CryBB constants directly in the API call
+    CRYBB_STYLE_URL = "https://crybb-assets-p55s0u52l-juliovivas99s-projects.vercel.app/crybb.jpeg"
+    CRYBB_PROMPT = "change the clothes of the first character to the clothes of the character in the second image, if needed change his hair color, skin color, eyes color and tattoos in case they are different from the original image. keep the style consistent to the one in the first image.\nVERY IMPORTANT, always keep the tears\n"
+    
+    # Ensure correct image order: [CryBB brand image, user profile picture]
+    if len(image_urls) >= 2:
+        # Use provided user profile picture as second image
+        final_image_urls = [CRYBB_STYLE_URL, image_urls[1]]
+    else:
+        # Fallback if only one image provided
+        final_image_urls = [CRYBB_STYLE_URL, image_urls[0]]
+    
+    print(f"CryBB API call: prompt='{CRYBB_PROMPT[:50]}...', images=[0]={CRYBB_STYLE_URL}, [1]={final_image_urls[1]}")
+    
+    created = _post_prediction(model=model, token=token, prompt=CRYBB_PROMPT, image_urls=final_image_urls)
     pred_id = created.get("id")
     if not pred_id:
         raise AIGenerationError("Prediction ID missing from Replicate response")
