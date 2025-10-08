@@ -89,16 +89,24 @@ class CryBBBot:
                 return
             
             # Generate image with [style, target_pfp] order
-            image_bytes = self.orchestrator.render_with_urls(
-                [Config.CRYBB_STYLE_URL, pfp_url],
-                mention_text=tweet_text or ""
-            )
-            
-            # Reply with processed image
-            reply_text = f"Here's your CryBB PFP @{target_username} 🍼"
-            self.twitter_client.reply_with_image(tweet_id, reply_text, image_bytes)
-            
-            print(f"Successfully processed mention {tweet_id}")
+            try:
+                image_bytes = self.orchestrator.render_with_urls(
+                    [Config.CRYBB_STYLE_URL, pfp_url],
+                    mention_text=tweet_text or ""
+                )
+                
+                # Reply with processed image
+                reply_text = f"Here's your CryBB PFP @{target_username} 🍼"
+                self.twitter_client.reply_with_image(tweet_id, reply_text, image_bytes)
+                
+                print(f"Successfully processed mention {tweet_id}")
+                
+            except Exception as ai_error:
+                print(f"[AI] ERROR {ai_error}")
+                # Reply with text-only error message (no image)
+                error_text = f"Sorry @{target_username}, I couldn't generate the CryBB image right now (model input invalid). Try again in a minute."
+                self.twitter_client.reply_text_only(tweet_id, error_text)
+                print(f"Sent text-only error reply for mention {tweet_id}")
             
         except Exception as e:
             print(f"Error processing mention {tweet.id}: {e}")
