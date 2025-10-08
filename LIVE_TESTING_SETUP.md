@@ -65,6 +65,9 @@ AI_MAX_CONCURRENCY=2
 AI_MAX_ATTEMPTS=2
 IMAGE_PIPELINE=ai
 CRYBB_STYLE_URL=https://crybb-assets-p55s0u52l-juliovivas99s-projects.vercel.app/crybb.jpeg
+
+# Optional
+WATERMARK_TEXT=
 ```
 
 ### Step 2: Test Locally (Debug Mode)

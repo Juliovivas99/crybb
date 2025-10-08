@@ -128,7 +128,7 @@ def step_image_pipeline(artifacts_dir: str) -> Dict[str, Any]:
         from src.config import Config
 
         ip = ImageProcessor()
-        out_bytes = ip.render(pfp)
+        out_bytes = ip.render(pfp, watermark=Config.WATERMARK_TEXT)
         if not out_bytes:
             return fail(name, "Renderer returned empty bytes")
 

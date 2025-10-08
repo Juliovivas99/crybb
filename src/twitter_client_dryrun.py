@@ -72,26 +72,3 @@ class TwitterClientDryRun:
             f.write(image_bytes)
         
         print(f"Dry run reply written to {reply_dir}")
-    
-    def reply_text_only(self, tweet_id: str, text: str) -> None:
-        """Dry run text-only reply - write to outbox directory."""
-        outbox_dir = Config.OUTBOX_DIR
-        os.makedirs(outbox_dir, exist_ok=True)
-        
-        # Create timestamp-based directory
-        timestamp = int(time.time())
-        reply_dir = os.path.join(outbox_dir, f"{timestamp}_{tweet_id}")
-        os.makedirs(reply_dir, exist_ok=True)
-        
-        # Write reply data
-        reply_data = {
-            "tweet_id": tweet_id,
-            "text": text,
-            "timestamp": timestamp,
-            "text_only": True
-        }
-        
-        with open(os.path.join(reply_dir, "reply.json"), "w") as f:
-            json.dump(reply_data, f, indent=2)
-        
-        print(f"Dry run text-only reply written to {reply_dir}")

@@ -1,14 +1,7 @@
 from typing import List
 from src.image_processor import ImageProcessor
 from src.ai.nano_banana_client import run_nano_banana
-
-
-def normalize_pfp_url(pfp_url: str) -> str:
-    """Normalize profile picture URL to ensure it's accessible."""
-    # Remove any size parameters and ensure we get a good quality image
-    if "_400x400" in pfp_url:
-        return pfp_url.replace("_400x400", "_400x400")
-    return pfp_url
+from src.ai.prompt_crybb import build_prompt
 
 
 def render_placeholder_bytes(pfp_url: str, cfg) -> bytes:
@@ -16,7 +9,7 @@ def render_placeholder_bytes(pfp_url: str, cfg) -> bytes:
     r = requests.get(pfp_url, timeout=cfg.HTTP_TIMEOUT_SECS)
     r.raise_for_status()
     img_bytes = r.content
-    return ImageProcessor().render(img_bytes)
+    return ImageProcessor().render(img_bytes, watermark=cfg.WATERMARK_TEXT)
 
 
 class Orchestrator:
@@ -28,20 +21,17 @@ class Orchestrator:
         mode = (self.cfg.IMAGE_PIPELINE or "ai").lower()
         if mode == "placeholder":
             return render_placeholder_bytes(pfp_url, self.cfg)
-        
-        # Prepare inputs with proper order
-        style = self.cfg.CRYBB_STYLE_URL
-        assert style, "CRYBB_STYLE_URL must be set"
-        
-        pfp = normalize_pfp_url(pfp_url)
-        assert pfp, "Profile picture URL must be provided"
-        
-        image_urls = [style, pfp]  # style FIRST
-        print(f"[AI] order-ok style_first")
-        
-        # No fallback - let exceptions bubble up
-        print(f"Starting AI generation for PFP: {pfp}")
-        return run_nano_banana(prompt="", image_urls=image_urls, cfg=self.cfg)
+        try:
+            # Direct AI generation without separate AIGenerator class
+            if not self.cfg.CRYBB_STYLE_URL:
+                raise ValueError("CRYBB_STYLE_URL is required for AI pipeline")
+            prompt = build_prompt()
+            # Fixed: enforce [style, pfp] order
+            image_urls = [self.cfg.CRYBB_STYLE_URL, pfp_url]
+            print(f"Nano-banana image order: [0]={self.cfg.CRYBB_STYLE_URL}, [1]={pfp_url}")
+            return run_nano_banana(prompt=prompt, image_urls=image_urls, cfg=self.cfg)
+        except Exception:
+            return render_placeholder_bytes(pfp_url, self.cfg)
 
     def render_with_urls(self, image_urls: List[str], mention_text: str = "") -> bytes:
         """New method that accepts image URLs list directly."""
@@ -49,18 +39,14 @@ class Orchestrator:
         if mode == "placeholder":
             # Use second URL for placeholder (target pfp)
             return render_placeholder_bytes(image_urls[1] if len(image_urls) > 1 else image_urls[0], self.cfg)
-        
-        # Prepare inputs with proper order
-        style = self.cfg.CRYBB_STYLE_URL
-        assert style, "CRYBB_STYLE_URL must be set"
-        
-        user_pfp = image_urls[1] if len(image_urls) > 1 else image_urls[0]
-        pfp = normalize_pfp_url(user_pfp)
-        assert pfp, "Profile picture URL must be provided"
-        
-        image_urls_ordered = [style, pfp]  # style FIRST
-        print(f"[AI] order-ok style_first")
-        
-        # No fallback - let exceptions bubble up
-        print(f"Starting AI generation for PFP: {pfp}")
-        return run_nano_banana(prompt="", image_urls=image_urls_ordered, cfg=self.cfg)
+        try:
+            if not self.cfg.CRYBB_STYLE_URL:
+                raise ValueError("CRYBB_STYLE_URL is required for AI pipeline")
+            prompt = build_prompt()
+            # Use provided image_urls directly
+            print(f"Nano-banana image order: [0]={image_urls[0] if len(image_urls) > 0 else 'N/A'}, [1]={image_urls[1] if len(image_urls) > 1 else 'N/A'}")
+            return run_nano_banana(prompt=prompt, image_urls=image_urls, cfg=self.cfg)
+        except Exception as e:
+            print(f"AI generation failed: {e}")
+            # Fallback to placeholder with second URL (target pfp)
+            return render_placeholder_bytes(image_urls[1] if len(image_urls) > 1 else image_urls[0], self.cfg)

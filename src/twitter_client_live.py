@@ -153,15 +153,3 @@ class TwitterClientLive:
         except Exception as e:
             print(f"Error replying to tweet {in_reply_to_tweet_id}: {e}")
             raise
-    
-    def reply_text_only(self, in_reply_to_tweet_id: str, text: str) -> None:
-        """Reply with text only (no image) using Twitter API."""
-        try:
-            self.v2_client.create_tweet(
-                text=text,
-                in_reply_to_tweet_id=in_reply_to_tweet_id
-            )
-            print(f"Successfully sent text-only reply to tweet {in_reply_to_tweet_id}")
-        except Exception as e:
-            print(f"Error sending text-only reply to tweet {in_reply_to_tweet_id}: {e}")
-            raise

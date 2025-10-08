@@ -4,7 +4,6 @@ Handles mention polling, processing, and replying.
 """
 import time
 import threading
-import logging
 import tweepy
 from typing import Optional
 from .config import Config
@@ -89,24 +88,16 @@ class CryBBBot:
                 return
             
             # Generate image with [style, target_pfp] order
-            try:
-                image_bytes = self.orchestrator.render_with_urls(
-                    [Config.CRYBB_STYLE_URL, pfp_url],
-                    mention_text=tweet_text or ""
-                )
-                
-                # Reply with processed image
-                reply_text = f"Here's your CryBB PFP @{target_username} 🍼"
-                self.twitter_client.reply_with_image(tweet_id, reply_text, image_bytes)
-                
-                print(f"Successfully processed mention {tweet_id}")
-                
-            except Exception as ai_error:
-                print(f"[AI] ERROR {ai_error}")
-                # Reply with text-only error message (no image)
-                error_text = f"Sorry @{target_username}, I couldn't generate the CryBB image right now (model input invalid). Try again in a minute."
-                self.twitter_client.reply_text_only(tweet_id, error_text)
-                print(f"Sent text-only error reply for mention {tweet_id}")
+            image_bytes = self.orchestrator.render_with_urls(
+                [Config.CRYBB_STYLE_URL, pfp_url],
+                mention_text=tweet_text or ""
+            )
+            
+            # Reply with processed image
+            reply_text = f"Here's your CryBB PFP @{target_username} 🍼"
+            self.twitter_client.reply_with_image(tweet_id, reply_text, image_bytes)
+            
+            print(f"Successfully processed mention {tweet_id}")
             
         except Exception as e:
             print(f"Error processing mention {tweet.id}: {e}")
@@ -199,21 +190,13 @@ class CryBBBot:
 
 def main():
     """Main entry point."""
-    # Setup logging
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    )
-    logger = logging.getLogger("crybb.main")
-    
     try:
-        logger.info("Boot: env loaded, proceeding with pipeline init")
         bot = CryBBBot()
         bot.start()
     except KeyboardInterrupt:
-        logger.info("Bot stopped by user")
+        print("Bot stopped by user")
     except Exception as e:
-        logger.error(f"Fatal error: {e}")
+        print(f"Fatal error: {e}")
         raise
 
 if __name__ == "__main__":

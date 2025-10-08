@@ -65,7 +65,7 @@ def main() -> int:
         print("Failed to download image bytes; aborting.")
         return 1
 
-    out_bytes = processor.render(img_bytes)
+    out_bytes = processor.render(img_bytes, watermark=Config.WATERMARK_TEXT)
     reply_text = format_friendly_message(target)
     client.reply_with_image(tweet_id, reply_text, out_bytes)
 

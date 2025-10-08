@@ -14,13 +14,27 @@
   },
   "files": [
     {
-      "path": "LIVE_TESTING_SETUP.md",
-      "size_kb": 4.32,
-      "modified_time": 1759873661.8457925,
+      "path": "CHANGES_SUMMARY.md",
+      "size_kb": 3.93,
+      "modified_time": 1759880573.1171837,
       "type": "md",
       "purpose": "Documentation",
       "role": "docs",
-      "hash": "b625bbee1c35181abd85513cfbb70bb156799ed1fb1665521059cd8f5ea95ec4",
+      "hash": "0a0f1922af598124c26ed68176d002c39a19ceb82b3fc775ee55d9106321fbef",
+      "imports": [],
+      "is_entrypoint": false,
+      "is_large_asset": false,
+      "is_dead": false,
+      "is_duplicate": false
+    },
+    {
+      "path": "LIVE_TESTING_SETUP.md",
+      "size_kb": 4.29,
+      "modified_time": 1759883907.8723445,
+      "type": "md",
+      "purpose": "Documentation",
+      "role": "docs",
+      "hash": "04958995376d32e3dd8fa695ca93012772a752f6d21c772656142abb1c371cdc",
       "imports": [],
       "is_entrypoint": false,
       "is_large_asset": false,
@@ -30,11 +44,11 @@
     {
       "path": "requirements.txt",
       "size_kb": 0.13,
-      "modified_time": 1759873163.1099222,
+      "modified_time": 1759887198.4498444,
       "type": "txt",
       "purpose": "Python dependencies",
       "role": "config",
-      "hash": "e5b914140a6a7afd758460797c08181421bd5f497e4f79db814476974c1b2237",
+      "hash": "6c3655d0ccd5bda206cc2c70bc6a5e56c61c1b5b7a821d8d2b084801355f3ab7",
       "imports": [],
       "is_entrypoint": false,
       "is_large_asset": false,
@@ -56,13 +70,41 @@
       "is_duplicate": false
     },
     {
+      "path": "DIFF_SUMMARY.md",
+      "size_kb": 6.56,
+      "modified_time": 1759880573.117208,
+      "type": "md",
+      "purpose": "Documentation",
+      "role": "docs",
+      "hash": "b8b23c6a32130b275d96e1b5b947a86a3755bb2a50119127f4a6442a4af9c1a9",
+      "imports": [],
+      "is_entrypoint": false,
+      "is_large_asset": false,
+      "is_dead": false,
+      "is_duplicate": false
+    },
+    {
       "path": "README.md",
-      "size_kb": 10.28,
-      "modified_time": 1759874725.3077824,
+      "size_kb": 10.99,
+      "modified_time": 1759883907.8726616,
       "type": "md",
       "purpose": "Project documentation",
       "role": "docs",
-      "hash": "8ee7df24bf4324e594c2d4a539f15f0f0691caf1420c8736db9683f887abe2a4",
+      "hash": "04c23ce57175810d1ba7595ac7bba90955eb4cc10f13e43b384810d08e6cfbd7",
+      "imports": [],
+      "is_entrypoint": false,
+      "is_large_asset": false,
+      "is_dead": false,
+      "is_duplicate": false
+    },
+    {
+      "path": "DEPLOYMENT_GUIDE.md",
+      "size_kb": 7.83,
+      "modified_time": 1759877197.6046646,
+      "type": "md",
+      "purpose": "Documentation",
+      "role": "docs",
+      "hash": "bc52385d1a1c1dfea5eada0646c2cf5f0658a178f2b5b9bdc18ccddcccfec4ab",
       "imports": [],
       "is_entrypoint": false,
       "is_large_asset": false,
@@ -71,12 +113,12 @@
     },
     {
       "path": ".env",
-      "size_kb": 0.99,
-      "modified_time": 1759872283.0474863,
+      "size_kb": 0.92,
+      "modified_time": 1759888775.8806698,
       "type": "unknown",
       "purpose": "Unknown purpose",
       "role": "unknown",
-      "hash": "e5ea3242ccead7f87ae6ab06f537ce94b51d116254ca0b58855b2b904ae33936",
+      "hash": "b2c4e767491b164c639687e11c903ce6288a5f3e14eb9bd44a39a95f04bbb102",
       "imports": [],
       "is_entrypoint": false,
       "is_large_asset": false,
@@ -85,12 +127,12 @@
     },
     {
       "path": ".env.example.min",
-      "size_kb": 0.37,
-      "modified_time": 1759872743.688947,
+      "size_kb": 0.36,
+      "modified_time": 1759883788.7112966,
       "type": "min",
       "purpose": "Unknown purpose",
       "role": "unknown",
-      "hash": "0c2738738350347dc3fa30cfde20bfe382eafa0e5179a2c2bb33f80e37e303af",
+      "hash": "9d1d47212b052ae79b3f2892be032dfe05d782734b3cb4a581c81eaef03a765b",
       "imports": [],
       "is_entrypoint": false,
       "is_large_asset": false,
@@ -127,12 +169,12 @@
     },
     {
       "path": "env.example",
-      "size_kb": 0.52,
-      "modified_time": 1759871374.2230074,
+      "size_kb": 0.56,
+      "modified_time": 1759883806.344426,
       "type": "example",
       "purpose": "Unknown purpose",
       "role": "unknown",
-      "hash": "a9b9e9723f735824c8f83d784373046ef1188ebdebb677df323700ef8fae7321",
+      "hash": "c1934be5d758ee57fd9f37a57390346b9dcdfc4c4778ad05ce82ce77a3653e38",
       "imports": [],
       "is_entrypoint": false,
       "is_large_asset": false,
@@ -141,12 +183,12 @@
     },
     {
       "path": "tools/run_diagnostics.py",
-      "size_kb": 14.54,
-      "modified_time": 1759871374.231031,
+      "size_kb": 14.51,
+      "modified_time": 1759883907.8460188,
       "type": "py",
       "purpose": "Development tool/diagnostics",
       "role": "dev-tool",
-      "hash": "319358a3f0823987fbaeb4e3cfd9c69c93642474449742992b6890e7a565a3a9",
+      "hash": "f3c692c0bd67218194837a5cc89ddfdba933b5844a122127f388c394e5701707",
       "imports": [
         "argparse",
         "io",
@@ -179,12 +221,12 @@
     },
     {
       "path": "tools/simulate_once.py",
-      "size_kb": 2.32,
-      "modified_time": 1759871191.6614053,
+      "size_kb": 2.29,
+      "modified_time": 1759883907.8461554,
       "type": "py",
       "purpose": "Development tool/diagnostics",
       "role": "dev-tool",
-      "hash": "41703c011568395c210efc5451afd0ec146140bbba0cde5f492eb7dd4704e7c3",
+      "hash": "95a30d7704ed8a3923da1eeca37e37b3010e36449c14a8dddae24a2dd2bc5319",
       "imports": [
         "os",
         "sys",
@@ -252,16 +294,17 @@
     },
     {
       "path": "tools/run_ai_smoke.py",
-      "size_kb": 1.12,
-      "modified_time": 1759871374.2391965,
+      "size_kb": 1.82,
+      "modified_time": 1759888277.7038028,
       "type": "py",
       "purpose": "Development tool/diagnostics",
       "role": "dev-tool",
-      "hash": "7976c649a00f84f831523001f6cb5dcd5c55e2da629d0820d681127901ad074f",
+      "hash": "233e9aae0d1eae54ab891f7b226f31ef1da9e558c9a96b5f97f8843eae793461",
       "imports": [
         "argparse",
         "os",
         "sys",
+        "requests",
         "dotenv",
         "src.config",
         "src.pipeline.orchestrator"
@@ -367,6 +410,20 @@
       "is_duplicate": false
     },
     {
+      "path": "scripts/harden_complete.sh",
+      "size_kb": 6.83,
+      "modified_time": 1759877197.5961316,
+      "type": "sh",
+      "purpose": "#!/usr/bin/env bash",
+      "role": "unknown",
+      "hash": "e5895ee4143043eaac842ab1ba14f0a3fd08e2c6905beb05213d85610327a31f",
+      "imports": [],
+      "is_entrypoint": false,
+      "is_large_asset": false,
+      "is_dead": false,
+      "is_duplicate": false
+    },
+    {
       "path": "scripts/harden.sh",
       "size_kb": 2.0,
       "modified_time": 1759874725.2582314,
@@ -374,6 +431,48 @@
       "purpose": "#!/usr/bin/env bash",
       "role": "unknown",
       "hash": "5778da9a5cdab515ba0969493baa5441fe70a9a3736c8809260c06cc66b1e4bb",
+      "imports": [],
+      "is_entrypoint": false,
+      "is_large_asset": false,
+      "is_dead": false,
+      "is_duplicate": false
+    },
+    {
+      "path": "scripts/test_health.sh",
+      "size_kb": 0.48,
+      "modified_time": 1759877197.5906045,
+      "type": "sh",
+      "purpose": "#!/usr/bin/env bash",
+      "role": "unknown",
+      "hash": "42304a77a84b95a2213b68be66d7a99d25f078f8bbfeee8689825570a0c65a0c",
+      "imports": [],
+      "is_entrypoint": false,
+      "is_large_asset": false,
+      "is_dead": false,
+      "is_duplicate": false
+    },
+    {
+      "path": "scripts/deploy_complete.sh",
+      "size_kb": 10.21,
+      "modified_time": 1759877200.2543204,
+      "type": "sh",
+      "purpose": "#!/usr/bin/env bash",
+      "role": "unknown",
+      "hash": "c797f6788a8e818eab45da5f177e9e76af331eff3cb42e872b04f330073df73e",
+      "imports": [],
+      "is_entrypoint": false,
+      "is_large_asset": false,
+      "is_dead": false,
+      "is_duplicate": false
+    },
+    {
+      "path": "scripts/deployment_summary.sh",
+      "size_kb": 2.29,
+      "modified_time": 1759877197.6079552,
+      "type": "sh",
+      "purpose": "#!/usr/bin/env bash",
+      "role": "unknown",
+      "hash": "7479bbc3cde0dc098a870efc2073d5ddd4d35622243cbede5c822bc84fe45384",
       "imports": [],
       "is_entrypoint": false,
       "is_large_asset": false,
@@ -410,12 +509,12 @@
     },
     {
       "path": "scripts/crybb-bot.service",
-      "size_kb": 0.33,
-      "modified_time": 1759874725.2581658,
+      "size_kb": 0.99,
+      "modified_time": 1759877204.1782517,
       "type": "service",
       "purpose": "Unknown purpose",
       "role": "unknown",
-      "hash": "235ba50b3d505d9faf5bcc9177e998286e00ed428a7da9e11e5d5051d9eb9f93",
+      "hash": "1b17724d0129cc3865c1947aa97aba2225f7ce65f7821144bd6b46a59d923a89",
       "imports": [],
       "is_entrypoint": false,
       "is_large_asset": false,
@@ -466,42 +565,20 @@
     },
     {
       "path": "src/image_processor.py",
-      "size_kb": 2.44,
-      "modified_time": 1759871374.245774,
+      "size_kb": 1.24,
+      "modified_time": 1759883961.0617132,
       "type": "py",
       "purpose": "\"\"\"",
       "role": "runtime",
-      "hash": "5e0c64f56f6de5fd66f2daf53414b69dee77bd14a1ee4583b06233d7ab937543",
+      "hash": "d50127645471998e11dc9ab909a084bf07b79854af01486765b57e4c74a65de8",
       "imports": [
         "io",
-        "typing",
         "PIL",
         "config"
       ],
       "is_entrypoint": false,
       "is_large_asset": false,
       "is_dead": false,
-      "is_duplicate": false
-    },
-    {
-      "path": "src/twitter_client.py",
-      "size_kb": 6.91,
-      "modified_time": 1759873163.109993,
-      "type": "py",
-      "purpose": "Twitter/X API client",
-      "role": "runtime",
-      "hash": "e36ca4d565a7807776b5dd6f10b69e73a1482bd5d3331a62cb7b43d23c609345",
-      "imports": [
-        "tweepy",
-        "requests",
-        "io",
-        "typing",
-        "config",
-        "retry"
-      ],
-      "is_entrypoint": false,
-      "is_large_asset": false,
-      "is_dead": true,
       "is_duplicate": false
     },
     {
@@ -545,14 +622,15 @@
     },
     {
       "path": "src/config.py",
-      "size_kb": 3.39,
-      "modified_time": 1759871374.2230265,
+      "size_kb": 3.96,
+      "modified_time": 1759883961.0661123,
       "type": "py",
       "purpose": "Configuration management",
       "role": "runtime",
-      "hash": "fc3d343d13156107ad33d49cd3d2b7b4a9b0acc9c85a7a839a59d05383a85bf0",
+      "hash": "d1b06ae56113a6337f3cfb8ff7328058fd70e045f1fda458f329da17384737a4",
       "imports": [
         "os",
+        "logging",
         "typing",
         "dotenv"
       ],
@@ -563,17 +641,20 @@
     },
     {
       "path": "src/twitter_client_live.py",
-      "size_kb": 2.29,
-      "modified_time": 1759873163.1102324,
+      "size_kb": 6.01,
+      "modified_time": 1759888263.8133032,
       "type": "py",
       "purpose": "Twitter/X API client",
       "role": "runtime",
-      "hash": "e54f604fcd411c9b11f44f66080d58c178ccda0c14933654e26654b0c56ddfb2",
+      "hash": "825c8377e083f4406c4c33f27c4267d0f88ad4509859aa1e465f218bf7e52250",
       "imports": [
-        "os",
+        "io",
         "json",
+        "os",
         "time",
-        "twitter_client",
+        "requests",
+        "tweepy",
+        "typing",
         "config"
       ],
       "is_entrypoint": false,
@@ -616,14 +697,19 @@
     },
     {
       "path": "src/twitter_client_mock.py",
-      "size_kb": 0.97,
-      "modified_time": 1759873163.1099803,
+      "size_kb": 3.86,
+      "modified_time": 1759888270.9386787,
       "type": "py",
       "purpose": "Twitter/X API client",
       "role": "runtime",
-      "hash": "59a046d7138c5dbaf3d66cbba903ab656cd2f4636770a21e0cc1a3efd8716e53",
+      "hash": "61b54a30c9f98642ab4330ee7618c929fa7163741abc7b706d89f518046e1053",
       "imports": [
-        "twitter_client"
+        "json",
+        "os",
+        "time",
+        "time",
+        "typing",
+        "config"
       ],
       "is_entrypoint": false,
       "is_large_asset": false,
@@ -653,12 +739,12 @@
     },
     {
       "path": "src/utils.py",
-      "size_kb": 1.37,
-      "modified_time": 1759719591.0277767,
+      "size_kb": 2.74,
+      "modified_time": 1759880573.0558424,
       "type": "py",
       "purpose": "\"\"\"",
       "role": "runtime",
-      "hash": "a9162c1b93d7f4f5e72009ccab9b081f0af633d5f78a28e0be3587a922a26c96",
+      "hash": "353ffc97bc0d1eb0adb7d030460338edf484d0ee99f838a045610bd8d3beab5e",
       "imports": [
         "re",
         "typing"
@@ -669,33 +755,18 @@
       "is_duplicate": false
     },
     {
-      "path": "src/twitter_iface.py",
-      "size_kb": 0.63,
-      "modified_time": 1759873163.110108,
-      "type": "py",
-      "purpose": "Twitter/X API client",
-      "role": "runtime",
-      "hash": "9d950e73caa2e116a0f6bda2a5d0658252af90e5111c0c0f889b72b61697a9f0",
-      "imports": [
-        "typing"
-      ],
-      "is_entrypoint": false,
-      "is_large_asset": false,
-      "is_dead": true,
-      "is_duplicate": false
-    },
-    {
       "path": "src/storage.py",
-      "size_kb": 1.35,
-      "modified_time": 1759710968.2304075,
+      "size_kb": 1.13,
+      "modified_time": 1759875081.6121411,
       "type": "py",
       "purpose": "\"\"\"",
       "role": "runtime",
-      "hash": "5046d80ae7f72fac576a8a226fe37c2318a13a2978898ed8f0ef770ebfe95528",
+      "hash": "1137fcde9ed82a2a5262c8d078d936e917fa66dce42f795ebdd254ff8575f0a5",
       "imports": [
         "json",
         "os",
-        "typing"
+        "typing",
+        "config"
       ],
       "is_entrypoint": false,
       "is_large_asset": false,
@@ -704,15 +775,16 @@
     },
     {
       "path": "src/main.py",
-      "size_kb": 7.02,
-      "modified_time": 1759873661.820702,
+      "size_kb": 7.91,
+      "modified_time": 1759888257.0688357,
       "type": "py",
       "purpose": "Main application entry point",
       "role": "runtime",
-      "hash": "e13fe13ad3d462b2d28fe227b34d2b3ce98563e79017e7790a87de2c1d3fb4b3",
+      "hash": "38b5b115e1bb672a47ff97fae39a32be15240bdf570d4242a371e41ab714dce8",
       "imports": [
         "time",
         "threading",
+        "logging",
         "tweepy",
         "io",
         "uvicorn",
@@ -734,17 +806,17 @@
     },
     {
       "path": "src/twitter_client_dryrun.py",
-      "size_kb": 1.28,
-      "modified_time": 1759873163.109964,
+      "size_kb": 3.85,
+      "modified_time": 1759888268.3688164,
       "type": "py",
       "purpose": "Twitter/X API client",
       "role": "runtime",
-      "hash": "dcd2117072704104c8d5ec5861719b1500609d1eb5b4857f3ac0db60ad73f3c4",
+      "hash": "19f0fb5f6e0ed603415b805a30a3fab33ab4c268f5d0c90f5f1952b3b79aea88",
       "imports": [
-        "os",
         "json",
+        "os",
         "time",
-        "twitter_client",
+        "typing",
         "config"
       ],
       "is_entrypoint": false,
@@ -754,17 +826,17 @@
     },
     {
       "path": "src/pipeline/orchestrator.py",
-      "size_kb": 1.17,
-      "modified_time": 1759873163.1099117,
+      "size_kb": 2.54,
+      "modified_time": 1759888253.750772,
       "type": "py",
       "purpose": "Image processing orchestration",
       "role": "runtime",
-      "hash": "0d597fcdb25205de5570b7e6554387735a70b0537a8ea6ccd9bb2f14ff9175e3",
+      "hash": "caf50a3c636a244df4e74a63b77ef63b1c2be564915d2d6af5bce65f72b3df6a",
       "imports": [
         "requests",
+        "typing",
         "src.image_processor",
-        "src.ai.nano_banana_client",
-        "src.ai.prompt_crybb"
+        "src.ai.nano_banana_client"
       ],
       "is_entrypoint": false,
       "is_large_asset": false,
@@ -773,12 +845,12 @@
     },
     {
       "path": "src/ai/prompt_crybb.py",
-      "size_kb": 0.46,
-      "modified_time": 1759871374.223075,
+      "size_kb": 0.45,
+      "modified_time": 1759881912.071522,
       "type": "py",
       "purpose": "AI pipeline module",
       "role": "runtime",
-      "hash": "79f576c767bf165f71032b3f901953d3fea5f0ffc237dbb4c92583c8762ad4cd",
+      "hash": "d7058d9325af81c90b58b280c4f2e0e4d33504688bfc385afb0fa03ee3ee03e2",
       "imports": [],
       "is_entrypoint": false,
       "is_large_asset": false,
@@ -787,14 +859,17 @@
     },
     {
       "path": "src/ai/nano_banana_client.py",
-      "size_kb": 3.18,
-      "modified_time": 1759871374.2231343,
+      "size_kb": 4.8,
+      "modified_time": 1759889900.3755794,
       "type": "py",
       "purpose": "AI pipeline module",
       "role": "runtime",
-      "hash": "fa8a30c5adc1006d9c745ffeb9d3b46676c64ae4dff7d1f1696529d8750777b1",
+      "hash": "c00ab9c0bce32bdf3668cd87a8d9683aac2d2ff2f78f605f3c42b3a56ebe4216",
       "imports": [
         "time",
+        "requests",
+        "replicate",
+        "os",
         "requests",
         "__future__",
         "typing",
@@ -808,207 +883,208 @@
   ],
   "import_graph": {
     "tools.run_diagnostics": [
-      "typing",
-      "src.config",
-      "traceback",
-      "subprocess",
-      "os",
-      "sys",
-      "tools._diag_lib",
-      "src.rate_limiter",
-      "importlib",
-      "requests",
       "dotenv",
-      "io",
+      "src.pipeline.orchestrator",
+      "typing",
+      "requests",
       "json",
-      "datetime",
       "src.image_processor",
-      "argparse",
-      "src.pipeline.orchestrator"
+      "importlib",
+      "os",
+      "io",
+      "tools._diag_lib",
+      "traceback",
+      "datetime",
+      "sys",
+      "src.config",
+      "subprocess",
+      "src.rate_limiter",
+      "argparse"
     ],
     "tools.simulate_once": [
-      "src.config",
-      "time",
-      "os",
-      "sys",
-      "src.utils",
       "dotenv",
+      "time",
+      "src.image_processor",
+      "os",
       "src.twitter_factory",
-      "src.image_processor"
+      "sys",
+      "src.config",
+      "src.utils"
     ],
     "tools.test_basic_plan": [
-      "typing",
-      "os",
-      "sys",
-      "requests",
       "tweepy",
-      "re",
       "dotenv",
+      "typing",
+      "requests",
+      "json",
+      "os",
       "io",
-      "json"
+      "re",
+      "sys"
     ],
     "tools._audit_utils": [
       "typing",
-      "time",
-      "subprocess",
-      "os",
-      "ast",
-      "re",
+      "json",
       "pathlib",
+      "ast",
+      "time",
+      "os",
+      "re",
       "hashlib",
-      "json"
+      "subprocess"
     ],
     "tools.run_ai_smoke": [
-      "src.config",
+      "dotenv",
+      "src.pipeline.orchestrator",
+      "requests",
       "os",
       "sys",
-      "dotenv",
-      "argparse",
-      "src.pipeline.orchestrator"
+      "src.config",
+      "argparse"
     ],
     "tools.test_basic_api": [
-      "typing",
-      "time",
-      "subprocess",
-      "os",
-      "sys",
-      "requests",
       "tweepy",
-      "PIL",
       "dotenv",
-      "io"
+      "typing",
+      "requests",
+      "time",
+      "os",
+      "io",
+      "PIL",
+      "sys",
+      "subprocess"
     ],
     "tools._diag_lib": [
       "typing",
-      "time",
       "shutil",
-      "contextlib",
-      "os",
-      "sys",
       "json",
-      "datetime"
+      "time",
+      "os",
+      "contextlib",
+      "datetime",
+      "sys"
     ],
     "tools.probe_x_api": [
-      "typing",
-      "time",
-      "os",
-      "sys",
-      "requests",
       "tweepy",
       "dotenv",
-      "io"
+      "typing",
+      "requests",
+      "time",
+      "os",
+      "io",
+      "sys"
     ],
     "tools.repo_audit": [
       "typing",
+      "json",
+      "_audit_utils",
       "os",
       "sys",
       "pathlib",
-      "json",
-      "argparse",
-      "_audit_utils"
+      "argparse"
     ],
     "src.image_processor": [
-      "typing",
       "PIL",
       "config",
       "io"
     ],
-    "src.twitter_client": [
-      "typing",
-      "retry",
-      "requests",
-      "tweepy",
-      "io",
-      "config"
-    ],
     "src.server": [
+      "config",
       "fastapi",
       "os",
-      "uvicorn",
       "datetime",
-      "config"
+      "uvicorn"
     ],
     "src.twitter_factory": [
       "twitter_client_live",
-      "twitter_client_mock",
+      "twitter_client_dryrun",
       "config",
-      "twitter_client_dryrun"
+      "twitter_client_mock"
     ],
     "src.config": [
-      "os",
       "dotenv",
-      "typing"
+      "logging",
+      "typing",
+      "os"
     ],
     "src.twitter_client_live": [
+      "tweepy",
+      "typing",
+      "requests",
+      "json",
+      "config",
       "time",
       "os",
-      "twitter_client",
-      "json",
-      "config"
+      "io"
     ],
     "src.rate_limiter": [
-      "typing",
-      "time",
       "collections",
-      "config"
+      "typing",
+      "config",
+      "time"
     ],
     "src.twitter_client_mock": [
-      "twitter_client"
+      "typing",
+      "json",
+      "config",
+      "time",
+      "os"
     ],
     "src.retry": [
+      "tweepy",
       "typing",
       "time",
-      "tweepy",
       "logging",
-      "__future__",
-      "tenacity"
+      "tenacity",
+      "__future__"
     ],
     "src.utils": [
-      "typing",
-      "re"
-    ],
-    "src.twitter_iface": [
+      "re",
       "typing"
     ],
     "src.storage": [
-      "os",
       "typing",
-      "json"
-    ],
-    "src.main": [
-      "typing",
-      "time",
-      "threading",
-      "pipeline.orchestrator",
-      "twitter_factory",
-      "storage",
-      "image_processor",
-      "rate_limiter",
-      "utils",
-      "tweepy",
-      "PIL",
-      "server",
-      "uvicorn",
-      "io",
-      "config"
-    ],
-    "src.twitter_client_dryrun": [
-      "time",
       "os",
-      "twitter_client",
       "json",
       "config"
     ],
+    "src.main": [
+      "tweepy",
+      "typing",
+      "rate_limiter",
+      "config",
+      "time",
+      "image_processor",
+      "logging",
+      "utils",
+      "storage",
+      "server",
+      "io",
+      "threading",
+      "twitter_factory",
+      "PIL",
+      "pipeline.orchestrator",
+      "uvicorn"
+    ],
+    "src.twitter_client_dryrun": [
+      "typing",
+      "json",
+      "config",
+      "time",
+      "os"
+    ],
     "src.pipeline.orchestrator": [
-      "src.ai.prompt_crybb",
-      "src.image_processor",
       "src.ai.nano_banana_client",
-      "requests"
+      "typing",
+      "requests",
+      "src.image_processor"
     ],
     "src.ai.nano_banana_client": [
+      "replicate",
       "typing",
-      "time",
       "requests",
+      "time",
+      "os",
       "src.retry",
       "__future__"
     ]
@@ -1020,34 +1096,33 @@
     "python-dotenv": "1.0.1",
     "fastapi": "0.112.2",
     "uvicorn": "0.30.6",
-    "pytest": "7.4.4",
-    "tenacity": "8.5.0"
+    "tenacity": "8.5.0",
+    "replicate": "0.25.1"
   },
   "environment_variables": [
-    "POLL_SECONDS",
-    "REPLICATE_TIMEOUT_SECS",
-    "IMAGE_PIPELINE",
-    "AI_MAX_ATTEMPTS",
-    "ACCESS_TOKEN",
-    "SKIP_CONFIG_VALIDATION",
-    "PORT",
-    "REPLICATE_MODEL",
-    "WATERMARK_TEXT",
-    "CLIENT_ID",
-    "TWITTER_MODE",
-    "AI_MAX_CONCURRENCY",
-    "CLIENT_SECRET",
-    "API_SECRET",
-    "CRYBB_STYLE_URL",
-    "ACCESS_SECRET",
-    "HTTP_TIMEOUT_SECS",
-    "OUTBOX_DIR",
-    "BOT_HANDLE",
-    "API_KEY",
-    "REPLICATE_POLL_INTERVAL_SECS",
-    "BEARER_TOKEN",
     "FIXTURES_DIR",
-    "REPLICATE_API_TOKEN"
+    "CRYBB_STYLE_URL",
+    "TWITTER_MODE",
+    "CLIENT_ID",
+    "REPLICATE_API_TOKEN",
+    "REPLICATE_POLL_INTERVAL_SECS",
+    "AI_MAX_CONCURRENCY",
+    "API_SECRET",
+    "REPLICATE_MODEL",
+    "HTTP_TIMEOUT_SECS",
+    "ACCESS_SECRET",
+    "API_KEY",
+    "POLL_SECONDS",
+    "SKIP_CONFIG_VALIDATION",
+    "CLIENT_SECRET",
+    "IMAGE_PIPELINE",
+    "BEARER_TOKEN",
+    "BOT_HANDLE",
+    "REPLICATE_TIMEOUT_SECS",
+    "AI_MAX_ATTEMPTS",
+    "PORT",
+    "ACCESS_TOKEN",
+    "OUTBOX_DIR"
   ],
   "makefile_targets": [
     "run",
@@ -1064,18 +1139,13 @@
   ],
   "docker_info": {},
   "analysis": {
-    "total_files": 43,
-    "dead_files": 6,
+    "total_files": 48,
+    "dead_files": 4,
     "duplicate_files": 0,
     "large_files": 0,
-    "total_size_kb": 137.7
+    "total_size_kb": 183.79999999999998
   },
   "recommendations": [
-    {
-      "action": "Remove",
-      "path": "src/twitter_client.py",
-      "reason": "Unused module - no imports or entrypoint"
-    },
     {
       "action": "Remove",
       "path": "src/twitter_client_live.py",
@@ -1084,11 +1154,6 @@
     {
       "action": "Remove",
       "path": "src/twitter_client_mock.py",
-      "reason": "Unused module - no imports or entrypoint"
-    },
-    {
-      "action": "Remove",
-      "path": "src/twitter_iface.py",
       "reason": "Unused module - no imports or entrypoint"
     },
     {

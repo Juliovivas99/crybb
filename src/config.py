@@ -3,20 +3,11 @@ Configuration module for CryBB Maker Bot.
 Handles environment variables and constants.
 """
 import os
-import logging
 from typing import Optional
-from dotenv import load_dotenv, find_dotenv
+from dotenv import load_dotenv
 
-# Load .env no matter where process starts
-load_dotenv(find_dotenv(usecwd=True), override=False)
-
-log = logging.getLogger("crybb.config")
-
-def _mask(v: str, keep=5) -> str:
-    """Mask sensitive values for logging."""
-    if not v: 
-        return "<missing>"
-    return v[:keep] + "…" if len(v) > keep else "…"
+# Load environment variables
+load_dotenv()
 
 class Config:
     """Configuration class with validation."""
@@ -33,6 +24,7 @@ class Config:
     # Bot configuration
     BOT_HANDLE: str = os.getenv("BOT_HANDLE", "crybbmaker")
     POLL_SECONDS: int = int(os.getenv("POLL_SECONDS", "30"))
+    WATERMARK_TEXT: Optional[str] = os.getenv("WATERMARK_TEXT", "made by @crybbmaker")
     PORT: int = int(os.getenv("PORT", "8000"))
     TWITTER_MODE: str = os.getenv("TWITTER_MODE", "live")  # live | dryrun | mock
     OUTBOX_DIR: str = os.getenv("OUTBOX_DIR", "outbox")
@@ -58,22 +50,7 @@ class Config:
     CRYBB_STYLE_URL: Optional[str] = os.getenv("CRYBB_STYLE_URL")
 
     # Pipeline mode
-    IMAGE_PIPELINE: str = os.getenv("IMAGE_PIPELINE", "ai")
-    
-    @classmethod
-    def log_config_status(cls) -> None:
-        """Log configuration status with masked sensitive values."""
-        log.info(f"CONFIG: IMAGE_PIPELINE={cls.IMAGE_PIPELINE}")
-        log.info(f"CONFIG: CRYBB_STYLE_URL={_mask(cls.CRYBB_STYLE_URL)}")
-        log.info(f"CONFIG: REPLICATE_API_TOKEN={_mask(cls.REPLICATE_API_TOKEN)}")
-        
-        # Validate AI pipeline requirements
-        if cls.IMAGE_PIPELINE.lower() == "ai":
-            if not cls.CRYBB_STYLE_URL:
-                raise RuntimeError("CRYBB_STYLE_URL is required when IMAGE_PIPELINE=ai")
-            if not cls.REPLICATE_API_TOKEN:
-                raise RuntimeError("REPLICATE_API_TOKEN is required when IMAGE_PIPELINE=ai")
-            log.info("CONFIG: AI pipeline validation passed")
+    IMAGE_PIPELINE: str = os.getenv("IMAGE_PIPELINE", "ai")  # ai | placeholder
     
     @classmethod
     def validate(cls) -> None:
@@ -92,8 +69,17 @@ class Config:
         if missing:
             raise ValueError(f"Missing required environment variables: {', '.join(missing)}")
 
-        # Log configuration status and validate AI pipeline
-        cls.log_config_status()
+        # Additional validation for AI pipeline
+        if (cls.IMAGE_PIPELINE or "ai").lower() == "ai":
+            ai_missing = []
+            if not cls.REPLICATE_API_TOKEN:
+                ai_missing.append("REPLICATE_API_TOKEN")
+            if not cls.CRYBB_STYLE_URL:
+                ai_missing.append("CRYBB_STYLE_URL")
+            if ai_missing:
+                raise ValueError(
+                    "IMAGE_PIPELINE=ai requires: " + ", ".join(ai_missing)
+                )
     
     @classmethod
     def get_bot_handle_clean(cls) -> str:

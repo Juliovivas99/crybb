@@ -21,28 +21,6 @@ def main() -> int:
     try:
         from src.config import Config
         from src.pipeline.orchestrator import Orchestrator
-        
-        # Print URLs and HEAD status
-        style_url = Config.CRYBB_STYLE_URL
-        pfp_url = args.pfp_url
-        
-        print(f"Style URL: {style_url}")
-        print(f"PFP URL: {pfp_url}")
-        
-        # Check HEAD status
-        import requests
-        try:
-            style_head = requests.head(style_url, timeout=6)
-            print(f"Style HEAD status: {style_head.status_code}")
-        except Exception as e:
-            print(f"Style HEAD error: {e}")
-            
-        try:
-            pfp_head = requests.head(pfp_url, timeout=6)
-            print(f"PFP HEAD status: {pfp_head.status_code}")
-        except Exception as e:
-            print(f"PFP HEAD error: {e}")
-        
         orch = Orchestrator(Config)
         out = orch.render(pfp_url=args.pfp_url, mention_text="ai_smoke")
         artifacts_dir = os.path.join(ROOT_DIR, "reports", "artifacts")
