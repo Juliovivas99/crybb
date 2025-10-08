@@ -73,3 +73,6 @@ echo "  🔒 .env file secured with 600 permissions"
 echo ""
 echo "⚠️ Important: Ensure you have SSH key access before disconnecting!"
 echo "Test SSH access: ssh root@YOUR_DROPLET_IP"
+
+
+

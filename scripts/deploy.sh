@@ -92,3 +92,6 @@ echo "  Check logs:     journalctl -u $SERVICE_NAME -f"
 echo "  Restart bot:    sudo systemctl restart $SERVICE_NAME"
 echo "  Stop bot:       sudo systemctl stop $SERVICE_NAME"
 echo "  Check status:   sudo systemctl status $SERVICE_NAME"
+
+
+

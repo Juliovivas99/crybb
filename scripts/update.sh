@@ -30,3 +30,6 @@ sudo systemctl status $SERVICE_NAME.service --no-pager
 echo "✅ Update complete!"
 echo ""
 echo "Check logs with: journalctl -u $SERVICE_NAME -f"
+
+
+

@@ -239,3 +239,6 @@ sudo systemctl restart crybb-bot
    ```
 
 Your bot is now running as a lean, secure, and maintainable service on DigitalOcean! 🎉
+
+
+
