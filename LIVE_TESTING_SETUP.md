@@ -52,7 +52,7 @@ CLIENT_SECRET=your_client_secret_here
 BOT_HANDLE=@crybbmaker
 
 # General
-POLL_SECONDS=30
+POLL_SECONDS=60
 HTTP_TIMEOUT_SECS=15
 TWITTER_MODE=live
 

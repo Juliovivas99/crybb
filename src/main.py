@@ -1,24 +1,23 @@
 """
 Main processing loop for CryBB Maker Bot.
-Handles mention polling, processing, and replying.
+Handles mention polling, processing, and replying with intelligent rate limiting.
 """
 import time
 import threading
-import tweepy
 from typing import Optional
-from .config import Config
-from .twitter_factory import make_twitter_client
-from .image_processor import ImageProcessor
-from .rate_limiter import RateLimiter
-from .storage import Storage
-from .utils import (
+from config import Config
+from twitter_factory import make_twitter_client
+from image_processor import ImageProcessor
+from rate_limiter import RateLimiter
+from storage import Storage
+from utils import (
     extract_target_after_bot,
     normalize_pfp_url,
     format_friendly_message,
     format_rate_limit_message,
     format_error_message
 )
-from .pipeline.orchestrator import Orchestrator
+from pipeline.orchestrator import Orchestrator
 
 class CryBBBot:
     """Main bot class."""
@@ -35,13 +34,16 @@ class CryBBBot:
         self.bot_id, self.bot_handle = self.twitter_client.get_bot_identity()
         print(f"Bot initialized: @{self.bot_handle} (ID: {self.bot_id})")
     
-    def process_mention(self, tweet) -> None:
-        """Process a single mention."""
+    def process_mention(self, tweet_data: dict) -> None:
+        """
+        Process a single mention using the new v2 client interface.
+        Optimized to minimize API calls through intelligent caching.
+        """
         try:
-            # Extract author info
-            author_id = str(tweet.author_id)
-            tweet_text = tweet.text
-            tweet_id = tweet.id
+            # Extract author info from tweet data
+            author_id = str(tweet_data.get('author_id', ''))
+            tweet_text = tweet_data.get('text', '')
+            tweet_id = tweet_data.get('id', '')
             
             print(f"Processing mention from {author_id}: {tweet_text}")
             
@@ -55,18 +57,43 @@ class CryBBBot:
                 )
                 return
             
-            # Get author username for fallback
-            author = self.twitter_client.get_user_by_id(int(author_id))
-            author_username = author.get("username") if author else None
+            # Get author info - use cached data if available from mentions expansion
+            author_username = None
+            if 'author' in tweet_data:
+                # Use expanded author data from mentions response (no extra API call needed!)
+                author_data = tweet_data['author']
+                author_username = author_data.get('username')
+                print(f"Using cached author data: @{author_username}")
+            else:
+                # Fallback: get author info via API call (should rarely happen with proper expansions)
+                author = self.twitter_client.get_user_by_id(author_id)
+                author_username = author.username if author else None
+                print(f"Fetched author data via API: @{author_username}")
             
             # Extract target using new robust method
-            target_username = extract_target_after_bot(tweet, Config.BOT_HANDLE, author_username or "")
+            target_username = extract_target_after_bot(tweet_data, Config.BOT_HANDLE, author_username or "")
             
             print(f"Target chosen: @{target_username}")
             
-            # Get target user and profile image
-            target_user = self.twitter_client.get_user_by_username(target_username)
-            if not target_user:
+            # Get target user and profile image - try expanded data first
+            target_user_data = None
+            if 'mentioned_users' in tweet_data and target_username in tweet_data['mentioned_users']:
+                # Use expanded user data (no API call needed!)
+                target_user_data = tweet_data['mentioned_users'][target_username]
+                print(f"Using cached target user data: @{target_username}")
+            else:
+                # Fallback: get target user via API call
+                target_user = self.twitter_client.get_user_by_username(target_username)
+                if target_user:
+                    target_user_data = {
+                        'id': target_user.id,
+                        'username': target_user.username,
+                        'name': target_user.name,
+                        'profile_image_url': target_user.profile_image_url
+                    }
+                    print(f"Fetched target user data via API: @{target_username}")
+            
+            if not target_user_data:
                 print(f"Could not fetch user @{target_username}")
                 self.twitter_client.reply_with_image(
                     tweet_id,
@@ -75,7 +102,7 @@ class CryBBBot:
                 )
                 return
             
-            pfp_url = normalize_pfp_url(target_user.get("profile_image_url") or "")
+            pfp_url = normalize_pfp_url(target_user_data.get('profile_image_url') or "")
             print(f"PFP={pfp_url}")
             
             if not pfp_url:
@@ -97,18 +124,28 @@ class CryBBBot:
             reply_text = f"Here's your CryBB PFP @{target_username} 🍼"
             self.twitter_client.reply_with_image(tweet_id, reply_text, image_bytes)
             
+            # Update metrics
+            from server import update_metrics
+            update_metrics(processed=1, replies_sent=1, last_mention_time=tweet_data.get('created_at'))
+            
             print(f"Successfully processed mention {tweet_id}")
             
         except Exception as e:
-            print(f"Error processing mention {tweet.id}: {e}")
+            print(f"Error processing mention {tweet_data.get('id', 'unknown')}: {e}")
             try:
                 self.twitter_client.reply_with_image(
-                    tweet.id,
+                    tweet_data.get('id', ''),
                     format_error_message(),
                     self._create_error_image()
                 )
+                # Update error metrics
+                from server import update_metrics
+                update_metrics(processed=1, ai_fail=1)
             except:
                 print("Failed to send error reply")
+                # Update error metrics
+                from server import update_metrics
+                update_metrics(processed=1, ai_fail=1)
     
     def _create_error_image(self) -> bytes:
         """Create a simple error image."""
@@ -131,13 +168,22 @@ class CryBBBot:
         return output.getvalue()
     
     def run_polling_loop(self) -> None:
-        """Run the main polling loop."""
+        """
+        Run the main polling loop with adaptive rate limiting.
+        Dynamically adjusts polling frequency based on rate limit status.
+        """
         since_id = self.storage.read_since_id()
         backoff_seconds = 1
+        consecutive_errors = 0
+        max_consecutive_errors = 5
         
         while True:
             try:
                 print(f"Polling for mentions since ID: {since_id}")
+                
+                # Check rate limit status before making requests
+                rate_status = self.twitter_client.get_rate_limit_status()
+                print(f"Rate limit status: {rate_status}")
                 
                 # Fetch mentions
                 mentions = self.twitter_client.get_mentions(since_id)
@@ -148,28 +194,39 @@ class CryBBBot:
                     # Process mentions (oldest first)
                     for mention in mentions:
                         self.process_mention(mention)
-                        since_id = mention.id
+                        since_id = mention['id']  # Updated for dict interface
                     
                     # Save since_id
                     self.storage.write_since_id(since_id)
-                    # Reset backoff on successful processing
+                    
+                    # Reset backoff and error counters on successful processing
                     backoff_seconds = 1
+                    consecutive_errors = 0
                 else:
                     print("No new mentions found")
                 
-                # Wait before next poll
-                time.sleep(Config.POLL_SECONDS)
-                
-            except tweepy.TooManyRequests as e:
-                print(f"Rate limited: {e}")
-                # Exponential backoff with cap
-                backoff_seconds = min(backoff_seconds * 2, 300)  # Cap at 5 minutes
-                print(f"Backing off for {backoff_seconds} seconds")
-                time.sleep(backoff_seconds)
+                # Smart polling based on activity
+                if mentions:
+                    wait_time = 5 * 60   # 5 minutes when active
+                else:
+                    wait_time = 30 * 60  # 30 minutes when quiet
+                print(f"Waiting {wait_time} seconds before next poll")
+                time.sleep(wait_time)
                 
             except Exception as e:
-                print(f"Error in polling loop: {e}")
-                time.sleep(60)  # Wait 1 minute on error
+                consecutive_errors += 1
+                print(f"Error in polling loop (attempt {consecutive_errors}): {e}")
+                
+                if consecutive_errors >= max_consecutive_errors:
+                    print(f"Too many consecutive errors ({consecutive_errors}). Backing off significantly.")
+                    time.sleep(300)  # Wait 5 minutes
+                    consecutive_errors = 0
+                else:
+                    # Exponential backoff with cap
+                    backoff_seconds = min(backoff_seconds * 2, 300)  # Cap at 5 minutes
+                    print(f"Backing off for {backoff_seconds} seconds")
+                    time.sleep(backoff_seconds)
+    
     
     def start(self) -> None:
         """Start the bot."""
@@ -178,7 +235,7 @@ class CryBBBot:
         # Start health server in background thread
         def run_health_server():
             import uvicorn
-            from .server import app
+            from server import app
             uvicorn.run(app, host="0.0.0.0", port=Config.PORT, log_level="warning")
         
         health_thread = threading.Thread(target=run_health_server, daemon=True)

@@ -5,7 +5,7 @@ Implements in-memory per-user rate limiting.
 from collections import deque
 from typing import Dict
 import time
-from .config import Config
+from config import Config
 
 class RateLimiter:
     """In-memory rate limiter using sliding window."""
@@ -60,3 +60,10 @@ class RateLimiter:
         
         oldest_request = self.user_requests[author_id][0]
         return oldest_request + self.window_size
+    
+    def calculate_adaptive_poll_interval(self) -> int:
+        """Calculate adaptive polling interval based on rate limits."""
+        # Simple implementation - return base poll interval
+        # This method is called by the main loop but the actual rate limiting
+        # is handled by the Twitter client's rate limiting
+        return Config.POLL_SECONDS

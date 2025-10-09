@@ -61,11 +61,15 @@ def step_env_config() -> Dict[str, Any]:
         from src.config import Config
 
         required = [
+            ("CLIENT_ID", Config.CLIENT_ID),
+            ("CLIENT_SECRET", Config.CLIENT_SECRET),
             ("API_KEY", Config.API_KEY),
             ("API_SECRET", Config.API_SECRET),
             ("ACCESS_TOKEN", Config.ACCESS_TOKEN),
             ("ACCESS_SECRET", Config.ACCESS_SECRET),
             ("BEARER_TOKEN", Config.BEARER_TOKEN),
+            ("OAUTH2_USER_ACCESS_TOKEN", Config.OAUTH2_USER_ACCESS_TOKEN),
+            ("OAUTH2_USER_REFRESH_TOKEN", Config.OAUTH2_USER_REFRESH_TOKEN),
             ("BOT_HANDLE", Config.BOT_HANDLE),
         ]
         missing = [k for k, v in required if not v]
@@ -74,6 +78,7 @@ def step_env_config() -> Dict[str, Any]:
             "TWITTER_MODE": Config.TWITTER_MODE,
             "POLL_SECONDS": Config.POLL_SECONDS,
             "HTTP_TIMEOUT_SECS": Config.HTTP_TIMEOUT_SECS,
+            "CRYBB_STYLE_URL": Config.CRYBB_STYLE_URL,
         }
         return ok(name, details, evidence) if not missing else fail(name, details, evidence)
     except Exception as e:
@@ -85,8 +90,10 @@ def step_dependencies() -> Dict[str, Any]:
     evidence: Dict[str, Any] = {}
     required = [
         ("Pillow", "PIL", None),
-        ("tweepy", "tweepy", None),
+        ("requests", "requests", None),
         ("tenacity", "tenacity", None),
+        ("fastapi", "fastapi", None),
+        ("uvicorn", "uvicorn", None),
     ]
     missing_required: List[str] = []
 
@@ -219,18 +226,18 @@ def step_twitter_probe(mode: str, allow_post: bool) -> Dict[str, Any]:
         # If mock mode, skip network probes
         if mode == "mock":
             return skip(name, "Mock mode: no network calls")
-        # Try to run the existing probe script
+        # Try to run the v2 auth verification script
         import subprocess
         env = os.environ.copy()
         env.setdefault("SKIP_CONFIG_VALIDATION", "1")
-        p = subprocess.run([sys.executable, os.path.join(ROOT_DIR, "tools", "probe_x_api.py")], env=env, cwd=ROOT_DIR, capture_output=True, text=True)
+        p = subprocess.run([sys.executable, os.path.join(ROOT_DIR, "tools", "verify_auth_paths.py")], env=env, cwd=ROOT_DIR, capture_output=True, text=True)
         details = (p.stdout or "") + ("\n" + p.stderr if p.stderr else "")
         if p.returncode == 0:
-            return ok(name, "Probe passed", {"output": details.strip()[:4000]})
+            return ok(name, "v2 Auth verification passed", {"output": details.strip()[:4000]})
         else:
-            return fail(name, "Probe failed", {"output": details.strip()[:4000]})
+            return fail(name, "v2 Auth verification failed", {"output": details.strip()[:4000]})
     except FileNotFoundError:
-        return skip(name, "probe_x_api.py not found")
+        return skip(name, "verify_auth_paths.py not found")
     except Exception as e:
         return fail(name, str(e))
 
@@ -340,6 +347,23 @@ def main() -> int:
         results.append(step_env_config())
     with time_block("Dependencies"):
         results.append(step_dependencies())
+    with time_block("CRYBB Style URL"):
+        try:
+            from src.config import Config
+            if not Config.CRYBB_STYLE_URL:
+                results.append(fail("CRYBB Style URL", "CRYBB_STYLE_URL not configured"))
+            else:
+                import requests
+                response = requests.head(Config.CRYBB_STYLE_URL, timeout=10, allow_redirects=True)
+                response.raise_for_status()
+                
+                content_type = response.headers.get('content-type', '').lower()
+                if not content_type.startswith('image/'):
+                    results.append(fail("CRYBB Style URL", f"URL does not return image content-type: {content_type}"))
+                else:
+                    results.append(ok("CRYBB Style URL", f"Style URL accessible: {content_type}", {"url": Config.CRYBB_STYLE_URL}))
+        except Exception as e:
+            results.append(fail("CRYBB Style URL", f"Style URL validation failed: {e}"))
     with time_block("Image Pipeline"):
         results.append(step_image_pipeline(artifacts_dir))
     with time_block("AI Pipeline (nano-banana)"):

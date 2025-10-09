@@ -4,7 +4,7 @@ Simple storage for persisting since_id across runs.
 import json
 import os
 from typing import Optional
-from .config import Config
+from config import Config
 
 
 class Storage:

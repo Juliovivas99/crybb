@@ -14,10 +14,7 @@ from tenacity import (
 )
 import logging
 
-try:
-    import tweepy  # type: ignore
-except Exception:  # pragma: no cover - tweepy may not be present in some test envs
-    tweepy = None  # type: ignore
+# Tweepy dependency removed - using pure requests implementation
 
 
 logger = logging.getLogger("crybb.retry")
@@ -56,9 +53,6 @@ def retry_api(func: Callable):
     """Retry decorator for Twitter API calls with rate limit handling."""
 
     def _should_retry_exception(exc: BaseException) -> bool:
-        # Tweepy TooManyRequests handling with sleep is performed by caller if needed.
-        if tweepy is not None and isinstance(exc, getattr(tweepy, "TooManyRequests", tuple())):
-            return True
         # Generic network / server errors
         return True
 
@@ -75,13 +69,15 @@ def maybe_sleep_for_rate_limit(e: BaseException) -> None:
     """Sleep to respect rate limits when TooManyRequests is encountered."""
     import time
 
-    if tweepy is not None and isinstance(e, getattr(tweepy, "TooManyRequests", tuple())):
-        retry_after = getattr(e, "retry_after", None)
-        sleep_seconds = int(retry_after) if retry_after else 60
-        logger.warning(
-            "rate_limited_sleep",
-            extra={"module": "retry", "sleep_seconds": sleep_seconds},
-        )
-        time.sleep(sleep_seconds)
+    # Check for HTTP 429 status code or similar rate limit indicators
+    if hasattr(e, 'response') and hasattr(e.response, 'status_code'):
+        if e.response.status_code == 429:
+            retry_after = e.response.headers.get('Retry-After', 60)
+            sleep_seconds = int(retry_after) if retry_after else 60
+            logger.warning(
+                "rate_limited_sleep",
+                extra={"module": "retry", "sleep_seconds": sleep_seconds},
+            )
+            time.sleep(sleep_seconds)
 
 

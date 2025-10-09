@@ -92,7 +92,7 @@ ACCESS_TOKEN=your_access_token
 ACCESS_SECRET=your_access_secret
 BEARER_TOKEN=your_bearer_token
 BOT_HANDLE=crybbmaker
-POLL_SECONDS=15
+POLL_SECONDS=60
 PORT=8000
 ```
 
@@ -103,6 +103,46 @@ Run the test suite:
 ```bash
 make test
 ```
+
+## Auth Split & Diagnostics
+
+The bot uses a **hybrid authentication approach**:
+
+- **Bearer Token**: For reading mentions (`GET /2/users/:id/mentions`)
+- **OAuth 1.0a**: For creating tweets (`POST /2/tweets`) and uploading media (`POST /1.1/media/upload.json`)
+
+### Diagnostic Commands
+
+1. **Verify authentication paths** (no posting):
+
+   ```bash
+   python tools/verify_auth_paths.py
+   ```
+
+2. **Probe mentions** (read-only):
+
+   ```bash
+   python tools/mentions_probe.py
+   ```
+
+3. **Run the bot**:
+   ```bash
+   python -m src.main
+   ```
+
+### Authentication Verification
+
+The `verify_auth_paths.py` script tests:
+
+- ✅ Bearer token authentication with v2 API
+- ✅ OAuth 1.0a media upload (uploads tiny 1×1 PNG)
+- ✅ OAuth 1.0a tweet creation (dry run - no actual posting)
+
+The `mentions_probe.py` script tests:
+
+- ✅ Bot identity fetching
+- ✅ Mentions retrieval with expanded user data
+- ✅ Mention pattern analysis (first username after bot)
 
 ## DigitalOcean Deployment
 

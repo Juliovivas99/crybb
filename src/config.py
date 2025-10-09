@@ -21,6 +21,11 @@ class Config:
     ACCESS_SECRET: str = os.getenv("ACCESS_SECRET", "")
     BEARER_TOKEN: str = os.getenv("BEARER_TOKEN", "")
     
+    # OAuth 2.0 user context
+    OAUTH2_USER_ACCESS_TOKEN: str = os.getenv("OAUTH2_USER_ACCESS_TOKEN", "")
+    OAUTH2_USER_REFRESH_TOKEN: str = os.getenv("OAUTH2_USER_REFRESH_TOKEN", "")
+    OAUTH2_TOKEN_URL: str = os.getenv("OAUTH2_TOKEN_URL", "https://api.twitter.com/2/oauth2/token")
+    
     # Bot configuration
     BOT_HANDLE: str = os.getenv("BOT_HANDLE", "crybbmaker")
     POLL_SECONDS: int = int(os.getenv("POLL_SECONDS", "30"))
@@ -62,6 +67,8 @@ class Config:
             ("ACCESS_TOKEN", cls.ACCESS_TOKEN),
             ("ACCESS_SECRET", cls.ACCESS_SECRET),
             ("BEARER_TOKEN", cls.BEARER_TOKEN),
+            ("OAUTH2_USER_ACCESS_TOKEN", cls.OAUTH2_USER_ACCESS_TOKEN),
+            ("OAUTH2_USER_REFRESH_TOKEN", cls.OAUTH2_USER_REFRESH_TOKEN),
         ]
         
         missing = [name for name, value in required_creds if not value]

@@ -1,6 +1,7 @@
 """
 Minimal Replicate client for Google nano-banana.
 Uses plain requests; no heavy SDKs.
+Includes URL validation and typed errors.
 """
 from __future__ import annotations
 
@@ -8,13 +9,45 @@ import time
 from typing import List
 import requests
 
-from src.retry import retry_http
+from retry import retry_http
 
 
 class AIGenerationError(Exception):
     def __init__(self, message: str, prediction_id: str | None = None):
         super().__init__(message)
         self.prediction_id = prediction_id
+
+
+class BAD_STYLE_URL(AIGenerationError):
+    """Style URL validation failed."""
+    pass
+
+
+class BAD_PFP_URL(AIGenerationError):
+    """Profile picture URL validation failed."""
+    pass
+
+
+def validate_image_url(url: str, url_type: str) -> None:
+    """Validate image URL with HEAD request."""
+    try:
+        response = requests.head(url, timeout=10, allow_redirects=True)
+        response.raise_for_status()
+        
+        content_type = response.headers.get('content-type', '').lower()
+        if not content_type.startswith('image/'):
+            if url_type == 'style':
+                raise BAD_STYLE_URL(f"Style URL does not return image content-type: {content_type}")
+            else:
+                raise BAD_PFP_URL(f"PFP URL does not return image content-type: {content_type}")
+        
+        print(f"[AI] {url_type.upper()}_URL validation passed: {content_type}")
+        
+    except requests.exceptions.RequestException as e:
+        if url_type == 'style':
+            raise BAD_STYLE_URL(f"Style URL validation failed: {e}")
+        else:
+            raise BAD_PFP_URL(f"PFP URL validation failed: {e}")
 
 
 @retry_http
@@ -61,6 +94,12 @@ def run_nano_banana(*, prompt: str, image_urls: List[str], cfg) -> bytes:
     token = cfg.REPLICATE_API_TOKEN
     if not token:
         raise AIGenerationError("REPLICATE_API_TOKEN missing")
+
+    # Validate URLs before making request
+    if len(image_urls) >= 1:
+        validate_image_url(image_urls[0], 'style')
+    if len(image_urls) >= 2:
+        validate_image_url(image_urls[1], 'pfp')
 
     # Replicate expects a model version id for \"version\"; allow passing full slug in env
     model = cfg.REPLICATE_MODEL

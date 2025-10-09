@@ -349,7 +349,7 @@ free -h
 Edit `/opt/crybb-bot/.env`:
 
 ```bash
-POLL_SECONDS=30  # Change from default 15 seconds
+POLL_SECONDS=60  # Change from default 15 seconds
 ```
 
 ### Rate Limiting

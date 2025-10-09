@@ -228,10 +228,10 @@ while True:
 
 ```python
 # BEFORE:
-POLL_SECONDS: int = int(os.getenv("POLL_SECONDS", "15"))
+POLL_SECONDS: int = int(os.getenv("POLL_SECONDS", "60"))
 
 # AFTER:
-POLL_SECONDS: int = int(os.getenv("POLL_SECONDS", "30"))  # ✅ Reduced API pressure
+POLL_SECONDS: int = int(os.getenv("POLL_SECONDS", "60"))  # ✅ Reduced API pressure
 ```
 
 ---

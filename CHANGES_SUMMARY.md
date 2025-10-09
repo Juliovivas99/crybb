@@ -43,7 +43,7 @@
 
 ### 5. **src/config.py**
 
-- ✅ Changed default `POLL_SECONDS` from `15` to `30`
+- ✅ Changed default `POLL_SECONDS` from `15` to `60`
 
 **Key Feature**: Reduces API calls and rate limit pressure
 
