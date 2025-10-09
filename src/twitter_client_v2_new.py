@@ -1,13 +1,13 @@
 """
-Modern Twitter API v2 client with OAuth 2.0 authentication.
-Replaces the legacy hybrid approach with pure v2 implementation.
+Modern Twitter API v2 client.
+Reads use Bearer token; writes (tweets/media/retweet) use OAuth1a.
 """
 import time
 from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import dataclass
 from config import Config
-from auth_v2 import create_bearer_session, create_user_session
-from x_v2 import XAPIv2Client
+import requests
+from x_v2 import XAPIv2Client, bearer_headers
 from ratelimit import RateLimiter
 
 
@@ -22,29 +22,19 @@ class UserInfo:
 
 class TwitterClientV2New:
     """
-    Modern Twitter API v2 client with OAuth 2.0 authentication.
-    
-    Key improvements:
-    - Pure v2 API implementation with OAuth 2.0 Bearer Token for reads
-    - OAuth 2.0 user context for writes (tweets and media upload)
-    - Intelligent caching to minimize API calls
-    - Centralized rate limiting with adaptive backoff
-    - Comprehensive error handling
+    Modern Twitter API v2 client.
+    Reads use Bearer token; writes (tweets/media) use OAuth 1.0a.
     """
     
     def __init__(self):
-        """Initialize the v2 client with OAuth 2.0 authentication."""
-        # Create authentication sessions
-        self.bearer_session = create_bearer_session()
-        self.user_session = create_user_session()
-        
-        # Create v2 API client
-        self.client = XAPIv2Client(self.bearer_session, self.user_session)
+        """Initialize the v2 client with Bearer + OAuth1a auth model."""
+        # Create v2 API client (uses global helpers)
+        self.client = XAPIv2Client()
         
         # Centralized rate limiter
         self.rate_limiter = RateLimiter()
         
-        print("Twitter API v2 client initialized with OAuth 2.0 authentication")
+        print("Twitter API v2 client initialized (Bearer reads, OAuth1a writes)")
     
     def get_bot_identity(self) -> Tuple[str, str]:
         """
@@ -53,7 +43,7 @@ class TwitterClientV2New:
         """
         return self.client.get_me()
     
-    def get_mentions(self, since_id: Optional[str] = None) -> List[Dict[str, Any]]:
+    def get_mentions(self, since_id: Optional[str] = None) -> List[Dict[str, Any]] | Dict[str, Any]:
         """
         Get mentions with comprehensive user data expansion to minimize additional API calls.
         Uses expansions to include author and mentioned user data in the response.
@@ -61,15 +51,7 @@ class TwitterClientV2New:
         try:
             bot_id, _ = self.get_bot_identity()
             
-            # Check if we should back off
-            if self.rate_limiter.should_backoff('users/mentions'):
-                print("Backing off from mentions due to rate limits")
-                return []
-            
             mentions = self.client.get_mentions(bot_id, since_id)
-            
-            # Apply adaptive backoff after mentions fetch
-            self.rate_limiter.maybe_sleep('users/mentions')
             
             return mentions
             
@@ -88,24 +70,9 @@ class TwitterClientV2New:
                 return cached_user
         
         try:
-            # Check if we should back off
-            if self.rate_limiter.should_backoff('users'):
-                print(f"Backing off from user lookup for {user_id}")
-                return None
-            
-            # Use v2 API to get user by ID
             url = f"https://api.twitter.com/2/users/{user_id}"
-            params = {
-                'user.fields': 'id,username,name,profile_image_url'
-            }
-            
-            response = self.bearer_session.get(url, params=params)
-            self.rate_limiter.update_rate_limits('users', 
-                int(response.headers.get('x-rate-limit-limit', 0)),
-                int(response.headers.get('x-rate-limit-remaining', 0)),
-                int(response.headers.get('x-rate-limit-reset', 0))
-            )
-            
+            params = {'user.fields': 'id,username,name,profile_image_url'}
+            response = requests.get(url, headers=bearer_headers(), params=params, timeout=Config.HTTP_TIMEOUT_SECS)
             response.raise_for_status()
             data = response.json()
             
@@ -137,7 +104,7 @@ class TwitterClientV2New:
     def download_bytes(self, url: str) -> Optional[bytes]:
         """Download image bytes from URL with proper error handling."""
         try:
-            response = self.bearer_session.session.get(url, timeout=Config.HTTP_TIMEOUT_SECS)
+            response = requests.get(url, timeout=Config.HTTP_TIMEOUT_SECS)
             response.raise_for_status()
             return response.content
         except Exception as e:
@@ -179,3 +146,10 @@ class TwitterClientV2New:
         self.client._bot_identity = None
         self.client._bot_identity_fetched_at = None
         print("All caches cleared")
+
+    # Sleeper helpers passthroughs
+    def get_user_tweets(self, user_id: str, max_results: int = 10):
+        return self.client.get_user_tweets(user_id, max_results)
+
+    def retweet_v11(self, tweet_id: str):
+        return self.client.retweet_v11(tweet_id)

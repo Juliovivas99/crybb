@@ -16,11 +16,11 @@
     {
       "path": "CHANGES_SUMMARY.md",
       "size_kb": 3.93,
-      "modified_time": 1759880573.1171837,
+      "modified_time": 1759950643.3168287,
       "type": "md",
       "purpose": "Documentation",
       "role": "docs",
-      "hash": "0a0f1922af598124c26ed68176d002c39a19ceb82b3fc775ee55d9106321fbef",
+      "hash": "1de3b420b61210b23e535aef0b7438b16a553fae1623a020ef9be95f4025862f",
       "imports": [],
       "is_entrypoint": false,
       "is_large_asset": false,
@@ -29,12 +29,40 @@
     },
     {
       "path": "LIVE_TESTING_SETUP.md",
-      "size_kb": 4.29,
-      "modified_time": 1759883907.8723445,
+      "size_kb": 4.3,
+      "modified_time": 1759950683.9418893,
       "type": "md",
       "purpose": "Documentation",
       "role": "docs",
-      "hash": "04958995376d32e3dd8fa695ca93012772a752f6d21c772656142abb1c371cdc",
+      "hash": "866754f76f9f8f1de7c798962221163b0ea080402d04782915e14aa6e3ae8e9e",
+      "imports": [],
+      "is_entrypoint": false,
+      "is_large_asset": false,
+      "is_dead": false,
+      "is_duplicate": false
+    },
+    {
+      "path": "RESCUE_PLAN.md",
+      "size_kb": 6.92,
+      "modified_time": 1760020897.427121,
+      "type": "md",
+      "purpose": "Documentation",
+      "role": "docs",
+      "hash": "dc55d086eeb9d7abffb00c488df2a9a17244ecabef4932453b247c7ed3708d56",
+      "imports": [],
+      "is_entrypoint": false,
+      "is_large_asset": false,
+      "is_dead": false,
+      "is_duplicate": false
+    },
+    {
+      "path": "REFACTOR_SUMMARY.md",
+      "size_kb": 6.3,
+      "modified_time": 1759976085.9218094,
+      "type": "md",
+      "purpose": "Documentation",
+      "role": "docs",
+      "hash": "b46efc327ebc2b354efb7e4bfd906f6208c4b5ddcc92c465808b0dc317ed39fb",
       "imports": [],
       "is_entrypoint": false,
       "is_large_asset": false,
@@ -43,12 +71,12 @@
     },
     {
       "path": "requirements.txt",
-      "size_kb": 0.13,
-      "modified_time": 1759887198.4498444,
+      "size_kb": 0.14,
+      "modified_time": 1760020897.4724228,
       "type": "txt",
       "purpose": "Python dependencies",
       "role": "config",
-      "hash": "6c3655d0ccd5bda206cc2c70bc6a5e56c61c1b5b7a821d8d2b084801355f3ab7",
+      "hash": "dd816d44f7daef439662a96ec4d2a91a3dc5d1c0cfb6dd8953402a3acea1b6d2",
       "imports": [],
       "is_entrypoint": false,
       "is_large_asset": false,
@@ -56,9 +84,27 @@
       "is_duplicate": false
     },
     {
+      "path": "test_auth.py",
+      "size_kb": 1.37,
+      "modified_time": 1759958203.7786279,
+      "type": "py",
+      "purpose": "#!/usr/bin/env python3",
+      "role": "unknown",
+      "hash": "b7540c68fbbea5b97d9ded1df6e5325086c2d9d47762d57921729194be1a2b81",
+      "imports": [
+        "os",
+        "sys",
+        "src.twitter_client_v2"
+      ],
+      "is_entrypoint": true,
+      "is_large_asset": false,
+      "is_dead": false,
+      "is_duplicate": false
+    },
+    {
       "path": "Makefile",
       "size_kb": 0.61,
-      "modified_time": 1759874725.258182,
+      "modified_time": 1759947168.8632085,
       "type": "unknown",
       "purpose": "Build automation",
       "role": "config",
@@ -72,11 +118,53 @@
     {
       "path": "DIFF_SUMMARY.md",
       "size_kb": 6.56,
-      "modified_time": 1759880573.117208,
+      "modified_time": 1759950621.524324,
       "type": "md",
       "purpose": "Documentation",
       "role": "docs",
-      "hash": "b8b23c6a32130b275d96e1b5b947a86a3755bb2a50119127f4a6442a4af9c1a9",
+      "hash": "ef790a7139717a906a0464891aa19b0d5dd8f07ea69108f27a80371429895eab",
+      "imports": [],
+      "is_entrypoint": false,
+      "is_large_asset": false,
+      "is_dead": false,
+      "is_duplicate": false
+    },
+    {
+      "path": "RESCUE_RESULT.md",
+      "size_kb": 6.57,
+      "modified_time": 1760020897.4348671,
+      "type": "md",
+      "purpose": "Documentation",
+      "role": "docs",
+      "hash": "bb67e0c129e2869dc3945d809227a5d2460cbd0c8b171a4a441c0545b2f3cc19",
+      "imports": [],
+      "is_entrypoint": false,
+      "is_large_asset": false,
+      "is_dead": false,
+      "is_duplicate": false
+    },
+    {
+      "path": "MENTION_HANDLING_SUMMARY.md",
+      "size_kb": 7.75,
+      "modified_time": 1759976085.92132,
+      "type": "md",
+      "purpose": "Documentation",
+      "role": "docs",
+      "hash": "dbf1cf3f541ad092759d11fc77a2e88d96ad6af321d7cd4fc587f70c004fba3e",
+      "imports": [],
+      "is_entrypoint": false,
+      "is_large_asset": false,
+      "is_dead": false,
+      "is_duplicate": false
+    },
+    {
+      "path": ".env.local.tokens",
+      "size_kb": 0.3,
+      "modified_time": 1759961622.4487684,
+      "type": "tokens",
+      "purpose": "# OAuth 2.0 User Tokens",
+      "role": "unknown",
+      "hash": "dbb2d0d9f1944ce5adc940d84a7c9b6b67d1e0a799f8fccfc067e60c0dfaabb6",
       "imports": [],
       "is_entrypoint": false,
       "is_large_asset": false,
@@ -85,12 +173,12 @@
     },
     {
       "path": "README.md",
-      "size_kb": 10.99,
-      "modified_time": 1759883907.8726616,
+      "size_kb": 11.09,
+      "modified_time": 1760020896.9989748,
       "type": "md",
       "purpose": "Project documentation",
       "role": "docs",
-      "hash": "04c23ce57175810d1ba7595ac7bba90955eb4cc10f13e43b384810d08e6cfbd7",
+      "hash": "c5c808e61212bcdf9c83192a4e62eab20c9afc01c8a329b0935d6092f75071da",
       "imports": [],
       "is_entrypoint": false,
       "is_large_asset": false,
@@ -98,13 +186,30 @@
       "is_duplicate": false
     },
     {
+      "path": "test_mentions.py",
+      "size_kb": 0.79,
+      "modified_time": 1759958203.794408,
+      "type": "py",
+      "purpose": "#!/usr/bin/env python3",
+      "role": "unknown",
+      "hash": "3b041be729bebfa17e2d4c486a4a8246bb4a2d8ef7acef25f88163a989f98522",
+      "imports": [
+        "sys",
+        "src.twitter_client_v2"
+      ],
+      "is_entrypoint": true,
+      "is_large_asset": false,
+      "is_dead": false,
+      "is_duplicate": false
+    },
+    {
       "path": "DEPLOYMENT_GUIDE.md",
       "size_kb": 7.83,
-      "modified_time": 1759877197.6046646,
+      "modified_time": 1759950602.3000355,
       "type": "md",
       "purpose": "Documentation",
       "role": "docs",
-      "hash": "bc52385d1a1c1dfea5eada0646c2cf5f0658a178f2b5b9bdc18ccddcccfec4ab",
+      "hash": "99d1abe930cf992cafbed10923a5234762a495b273cc8b38e09635839b1cfb87",
       "imports": [],
       "is_entrypoint": false,
       "is_large_asset": false,
@@ -113,12 +218,12 @@
     },
     {
       "path": ".env",
-      "size_kb": 0.92,
-      "modified_time": 1759888775.8806698,
+      "size_kb": 1.42,
+      "modified_time": 1760025448.227599,
       "type": "unknown",
-      "purpose": "Unknown purpose",
+      "purpose": "# OAuth 2.0 user context",
       "role": "unknown",
-      "hash": "b2c4e767491b164c639687e11c903ce6288a5f3e14eb9bd44a39a95f04bbb102",
+      "hash": "5cc998cdc4f32a43028cb56650c692c3a54f7969d37779a492f27cf828dfd3d4",
       "imports": [],
       "is_entrypoint": false,
       "is_large_asset": false,
@@ -141,16 +246,64 @@
     },
     {
       "path": "DIGITALOCEAN_DEPLOYMENT.md",
-      "size_kb": 4.94,
-      "modified_time": 1759874725.3207042,
+      "size_kb": 4.95,
+      "modified_time": 1759947169.0384169,
       "type": "md",
       "purpose": "Documentation",
       "role": "docs",
-      "hash": "094a1c1928cf0bf888c9cfb36b4f8ad42f9f42df7642c520c6c8bce85d380b6a",
+      "hash": "bd233b1455f84ee256a5787e274fe3d1ec146505f9d2270f0b9986279a0d0619",
       "imports": [],
       "is_entrypoint": false,
       "is_large_asset": false,
       "is_dead": false,
+      "is_duplicate": false
+    },
+    {
+      "path": "TWITTER_V2_MIGRATION.md",
+      "size_kb": 6.77,
+      "modified_time": 1759958203.601051,
+      "type": "md",
+      "purpose": "Documentation",
+      "role": "docs",
+      "hash": "cdb211948f83a401ae846d2eb635e74248f411966adb04ef1ea27ee3169d25a0",
+      "imports": [],
+      "is_entrypoint": false,
+      "is_large_asset": false,
+      "is_dead": false,
+      "is_duplicate": false
+    },
+    {
+      "path": "debug_mentions.py",
+      "size_kb": 0.6,
+      "modified_time": 1759958203.9146721,
+      "type": "py",
+      "purpose": "#!/usr/bin/env python3",
+      "role": "unknown",
+      "hash": "730ed1a67bca25ee5c900dd69029cf5b44079455e5a6aeef68573fa4622ad15e",
+      "imports": [
+        "sys",
+        "src.twitter_client_v2"
+      ],
+      "is_entrypoint": false,
+      "is_large_asset": false,
+      "is_dead": true,
+      "is_duplicate": false
+    },
+    {
+      "path": "reset_since_id.py",
+      "size_kb": 0.59,
+      "modified_time": 1759958203.8478396,
+      "type": "py",
+      "purpose": "#!/usr/bin/env python3",
+      "role": "unknown",
+      "hash": "42645681d0a11a3bc5e079ecc5822396aa9c28cd2024bcefde7a3e9609e19784",
+      "imports": [
+        "json",
+        "os"
+      ],
+      "is_entrypoint": false,
+      "is_large_asset": false,
+      "is_dead": true,
       "is_duplicate": false
     },
     {
@@ -169,12 +322,12 @@
     },
     {
       "path": "env.example",
-      "size_kb": 0.56,
-      "modified_time": 1759883806.344426,
+      "size_kb": 0.81,
+      "modified_time": 1760024980.3285503,
       "type": "example",
-      "purpose": "Unknown purpose",
+      "purpose": "# OAuth 1.0a credentials (required for media upload v1.1 endpoint)",
       "role": "unknown",
-      "hash": "c1934be5d758ee57fd9f37a57390346b9dcdfc4c4778ad05ce82ce77a3653e38",
+      "hash": "81c4069dba8016e621587962de426d525b69a0caf6d4e4b335647fe33027f95d",
       "imports": [],
       "is_entrypoint": false,
       "is_large_asset": false,
@@ -182,13 +335,32 @@
       "is_duplicate": false
     },
     {
-      "path": "tools/run_diagnostics.py",
-      "size_kb": 14.51,
-      "modified_time": 1759883907.8460188,
+      "path": "tools/sleeper_probe.py",
+      "size_kb": 0.71,
+      "modified_time": 1760024980.3286464,
       "type": "py",
       "purpose": "Development tool/diagnostics",
       "role": "dev-tool",
-      "hash": "f3c692c0bd67218194837a5cc89ddfdba933b5844a122127f388c394e5701707",
+      "hash": "950d4fd43480f6c9bc070b76106a74c0e94760f6c0f4a5ca6187f497a6e6ee1e",
+      "imports": [
+        "os",
+        "sys",
+        "twitter_factory",
+        "config"
+      ],
+      "is_entrypoint": true,
+      "is_large_asset": false,
+      "is_dead": false,
+      "is_duplicate": false
+    },
+    {
+      "path": "tools/run_diagnostics.py",
+      "size_kb": 15.88,
+      "modified_time": 1760020897.1136296,
+      "type": "py",
+      "purpose": "Development tool/diagnostics",
+      "role": "dev-tool",
+      "hash": "b104113daefc08d2c4a02840461e3ba25e1e0f2c9ecb91454af20ea5bbf183a8",
       "imports": [
         "argparse",
         "io",
@@ -201,6 +373,7 @@
         "subprocess",
         "subprocess",
         "requests",
+        "requests",
         "datetime",
         "typing",
         "dotenv",
@@ -212,7 +385,57 @@
         "importlib",
         "src.config",
         "src.config",
+        "src.config",
         "src.pipeline.orchestrator"
+      ],
+      "is_entrypoint": true,
+      "is_large_asset": false,
+      "is_dead": false,
+      "is_duplicate": false
+    },
+    {
+      "path": "tools/oauth2_pkce_callback_server.py",
+      "size_kb": 12.82,
+      "modified_time": 1760020897.1448734,
+      "type": "py",
+      "purpose": "Development tool/diagnostics",
+      "role": "dev-tool",
+      "hash": "111f2fd07fa638a83c67d31f5eefafb8b0baaeb477c564617197724870a52132",
+      "imports": [
+        "asyncio",
+        "base64",
+        "hashlib",
+        "os",
+        "secrets",
+        "urllib.parse",
+        "httpx",
+        "uvicorn",
+        "pathlib",
+        "typing",
+        "dotenv",
+        "fastapi",
+        "fastapi.responses"
+      ],
+      "is_entrypoint": true,
+      "is_large_asset": false,
+      "is_dead": false,
+      "is_duplicate": false
+    },
+    {
+      "path": "tools/test_media_upload.py",
+      "size_kb": 2.26,
+      "modified_time": 1759964956.2984717,
+      "type": "py",
+      "purpose": "Development tool/diagnostics",
+      "role": "dev-tool",
+      "hash": "cb8106d100ceae0ad1752d54903a64b3ddb38926cf8341f5fb7a659644087b98",
+      "imports": [
+        "os",
+        "io",
+        "requests",
+        "requests_oauthlib",
+        "dotenv",
+        "PIL"
       ],
       "is_entrypoint": true,
       "is_large_asset": false,
@@ -222,7 +445,7 @@
     {
       "path": "tools/simulate_once.py",
       "size_kb": 2.29,
-      "modified_time": 1759883907.8461554,
+      "modified_time": 1759892695.9603226,
       "type": "py",
       "purpose": "Development tool/diagnostics",
       "role": "dev-tool",
@@ -243,13 +466,38 @@
       "is_duplicate": false
     },
     {
-      "path": "tools/test_basic_plan.py",
-      "size_kb": 7.53,
-      "modified_time": 1759870594.2922642,
+      "path": "tools/verify_auth_paths.py",
+      "size_kb": 7.05,
+      "modified_time": 1760023367.703878,
       "type": "py",
       "purpose": "Development tool/diagnostics",
       "role": "dev-tool",
-      "hash": "96e4e5831ad9a490858238eb4be01272c149e10c57635471da45fd4339d1c14f",
+      "hash": "de6cb798a18e9dad66488b4939dc6f1a5d87e069bbffe4321e658e0d4215b599",
+      "imports": [
+        "os",
+        "sys",
+        "io",
+        "base64",
+        "json",
+        "requests",
+        "datetime",
+        "dotenv",
+        "config",
+        "x_v2"
+      ],
+      "is_entrypoint": true,
+      "is_large_asset": false,
+      "is_dead": false,
+      "is_duplicate": false
+    },
+    {
+      "path": "tools/test_basic_plan.py",
+      "size_kb": 7.53,
+      "modified_time": 1759947167.3959973,
+      "type": "py",
+      "purpose": "Development tool/diagnostics",
+      "role": "dev-tool",
+      "hash": "483d54118d0f8a58646a34cdb200d81149574416dbb883564440de3605f29e39",
       "imports": [
         "io",
         "json",
@@ -271,11 +519,11 @@
     {
       "path": "tools/_audit_utils.py",
       "size_kb": 9.71,
-      "modified_time": 1759872758.4614258,
+      "modified_time": 1759947167.4431002,
       "type": "py",
       "purpose": "Development tool/diagnostics",
       "role": "dev-tool",
-      "hash": "83d66b988215e32ea37df684157d20256f0d7758bbc64b86520d0d6744f62be8",
+      "hash": "dc566968b07a2990e55567dbff97d9eea11915dd25eef700f0b1c527d92a423e",
       "imports": [
         "ast",
         "hashlib",
@@ -294,17 +542,16 @@
     },
     {
       "path": "tools/run_ai_smoke.py",
-      "size_kb": 1.82,
-      "modified_time": 1759888277.7038028,
+      "size_kb": 1.12,
+      "modified_time": 1759891820.6642625,
       "type": "py",
       "purpose": "Development tool/diagnostics",
       "role": "dev-tool",
-      "hash": "233e9aae0d1eae54ab891f7b226f31ef1da9e558c9a96b5f97f8843eae793461",
+      "hash": "7976c649a00f84f831523001f6cb5dcd5c55e2da629d0820d681127901ad074f",
       "imports": [
         "argparse",
         "os",
         "sys",
-        "requests",
         "dotenv",
         "src.config",
         "src.pipeline.orchestrator"
@@ -316,12 +563,12 @@
     },
     {
       "path": "tools/test_basic_api.py",
-      "size_kb": 7.68,
-      "modified_time": 1759870594.1958854,
+      "size_kb": 7.69,
+      "modified_time": 1759947167.3557622,
       "type": "py",
       "purpose": "Development tool/diagnostics",
       "role": "dev-tool",
-      "hash": "5c861d40369f9679cfc4ae6f42d612342ecf667707da1752492e2528165dae3d",
+      "hash": "0fd0fe6bcdeb586877d6300df179f12c0e9418f0e28649bef597c57966f6fc74",
       "imports": [
         "io",
         "os",
@@ -342,13 +589,54 @@
       "is_duplicate": false
     },
     {
-      "path": "tools/_diag_lib.py",
-      "size_kb": 3.94,
-      "modified_time": 1759870594.119201,
+      "path": "tools/test_per_user_limiter.py",
+      "size_kb": 0.93,
+      "modified_time": 1760024980.3285875,
       "type": "py",
       "purpose": "Development tool/diagnostics",
       "role": "dev-tool",
-      "hash": "ba8fa6c97dbd306ba86200ec7ec0db9c63d85332b394cff203acd55c78c59dc4",
+      "hash": "c104fdc57d5e7ea3b5a2fae1f628097ca0f2074837a9ee816c5fb342bc9e5634",
+      "imports": [
+        "os",
+        "sys",
+        "time",
+        "per_user_limiter",
+        "config"
+      ],
+      "is_entrypoint": true,
+      "is_large_asset": false,
+      "is_dead": false,
+      "is_duplicate": false
+    },
+    {
+      "path": "tools/test_end_to_end_no_post.py",
+      "size_kb": 4.42,
+      "modified_time": 1760020897.1944432,
+      "type": "py",
+      "purpose": "Development tool/diagnostics",
+      "role": "dev-tool",
+      "hash": "10bde305293427b4a90c8700ae8f54bfe148d16fa91264952c54960f0eb4fa34",
+      "imports": [
+        "os",
+        "sys",
+        "io",
+        "PIL",
+        "config",
+        "x_v2"
+      ],
+      "is_entrypoint": true,
+      "is_large_asset": false,
+      "is_dead": false,
+      "is_duplicate": false
+    },
+    {
+      "path": "tools/_diag_lib.py",
+      "size_kb": 3.95,
+      "modified_time": 1759947167.2035878,
+      "type": "py",
+      "purpose": "Development tool/diagnostics",
+      "role": "dev-tool",
+      "hash": "1151ff1f108eac39d003eb5352546f4eb81f124c62cbef7853ea39a8d22a1b5c",
       "imports": [
         "contextlib",
         "json",
@@ -360,6 +648,44 @@
         "typing"
       ],
       "is_entrypoint": false,
+      "is_large_asset": false,
+      "is_dead": false,
+      "is_duplicate": false
+    },
+    {
+      "path": "tools/oauth2_store_tokens.py",
+      "size_kb": 1.69,
+      "modified_time": 1760020897.4150186,
+      "type": "py",
+      "purpose": "Development tool/diagnostics",
+      "role": "dev-tool",
+      "hash": "e6d1d3beaf4965ed39ef67961488922b5518ccd17c1302af3b0a701c927701d4",
+      "imports": [
+        "os",
+        "sys",
+        "json",
+        "dotenv"
+      ],
+      "is_entrypoint": true,
+      "is_large_asset": false,
+      "is_dead": false,
+      "is_duplicate": false
+    },
+    {
+      "path": "tools/test_mention_parsing.py",
+      "size_kb": 7.81,
+      "modified_time": 1759971536.1224163,
+      "type": "py",
+      "purpose": "Development tool/diagnostics",
+      "role": "dev-tool",
+      "hash": "f4afd8ce6c6d1ba12d3f9fb302bd2cbb69208aba3beb53193a16a0aabb80199a",
+      "imports": [
+        "sys",
+        "os",
+        "json",
+        "utils"
+      ],
+      "is_entrypoint": true,
       "is_large_asset": false,
       "is_dead": false,
       "is_duplicate": false
@@ -390,7 +716,7 @@
     {
       "path": "tools/repo_audit.py",
       "size_kb": 16.16,
-      "modified_time": 1759872758.4613986,
+      "modified_time": 1759947167.4590774,
       "type": "py",
       "purpose": "Development tool/diagnostics",
       "role": "dev-tool",
@@ -403,6 +729,56 @@
         "pathlib",
         "typing",
         "_audit_utils"
+      ],
+      "is_entrypoint": true,
+      "is_large_asset": false,
+      "is_dead": false,
+      "is_duplicate": false
+    },
+    {
+      "path": "tools/diagnose_v2.py",
+      "size_kb": 8.98,
+      "modified_time": 1759971536.1377552,
+      "type": "py",
+      "purpose": "Development tool/diagnostics",
+      "role": "dev-tool",
+      "hash": "6abce1e8b198c15791726f19a2c0da083e83ede4564bb20f0080b13be5a3efec",
+      "imports": [
+        "sys",
+        "os",
+        "argparse",
+        "json",
+        "tempfile",
+        "re",
+        "typing",
+        "config",
+        "utils",
+        "pipeline.orchestrator",
+        "twitter_factory"
+      ],
+      "is_entrypoint": true,
+      "is_large_asset": false,
+      "is_dead": false,
+      "is_duplicate": false
+    },
+    {
+      "path": "tools/mentions_probe.py",
+      "size_kb": 5.93,
+      "modified_time": 1760020897.0939543,
+      "type": "py",
+      "purpose": "Development tool/diagnostics",
+      "role": "dev-tool",
+      "hash": "fb8867e1adacfb03740981d348806743cf6a671ea4b1d64d1e108ef5be47a0f8",
+      "imports": [
+        "os",
+        "sys",
+        "traceback",
+        "datetime",
+        "dotenv",
+        "config",
+        "auth_v2",
+        "x_v2",
+        "utils"
       ],
       "is_entrypoint": true,
       "is_large_asset": false,
@@ -426,11 +802,11 @@
     {
       "path": "scripts/harden.sh",
       "size_kb": 2.0,
-      "modified_time": 1759874725.2582314,
+      "modified_time": 1759947168.7899628,
       "type": "sh",
       "purpose": "#!/usr/bin/env bash",
       "role": "unknown",
-      "hash": "5778da9a5cdab515ba0969493baa5441fe70a9a3736c8809260c06cc66b1e4bb",
+      "hash": "03c3bdacec0e97e0f113a0349d6c5c14f2b0e1f4225a1b90de90e9c772bb55d1",
       "imports": [],
       "is_entrypoint": false,
       "is_large_asset": false,
@@ -482,11 +858,11 @@
     {
       "path": "scripts/update.sh",
       "size_kb": 0.72,
-      "modified_time": 1759874725.258153,
+      "modified_time": 1759947168.4942262,
       "type": "sh",
       "purpose": "#!/usr/bin/env bash",
       "role": "unknown",
-      "hash": "c7554ead74dbfc70dfb7a937e8eadea957dd2dafe453a5018ff0c2c3caef7250",
+      "hash": "476599432b335f1b6d8ca10fc045fd26de0abf754dac53d86db5d595a6a0ded3",
       "imports": [],
       "is_entrypoint": false,
       "is_large_asset": false,
@@ -496,11 +872,11 @@
     {
       "path": "scripts/deploy.sh",
       "size_kb": 2.75,
-      "modified_time": 1759874725.2581744,
+      "modified_time": 1759947167.482182,
       "type": "sh",
       "purpose": "#!/usr/bin/env bash",
       "role": "unknown",
-      "hash": "a6a99573a4ac4e0fb0bdb6b4ea53e2bdd6dee294506047d664606609cf716cde",
+      "hash": "01aab5cbfd82003d3b9e5d30713da6126ad7014390307316979b44ce40f06bc6",
       "imports": [],
       "is_entrypoint": false,
       "is_large_asset": false,
@@ -551,12 +927,12 @@
     },
     {
       "path": "assets/crybb.jpeg",
-      "size_kb": 0.03,
-      "modified_time": 1759871374.2486315,
+      "size_kb": 38.3,
+      "modified_time": 1759948123.8269553,
       "type": "jpeg",
       "purpose": "Asset file",
       "role": "asset",
-      "hash": "4e0c281a3bd35fcf2a69e3ce8fb03a68bb7a0679e2af12caba4424a1f116610e",
+      "hash": "c7078a3ac956e77f2d06840eb82b03877d9491f28fad5fbf599fcf6b41b5a4d6",
       "imports": [],
       "is_entrypoint": false,
       "is_large_asset": false,
@@ -566,11 +942,11 @@
     {
       "path": "src/image_processor.py",
       "size_kb": 1.24,
-      "modified_time": 1759883961.0617132,
+      "modified_time": 1759971536.1513207,
       "type": "py",
       "purpose": "\"\"\"",
       "role": "runtime",
-      "hash": "d50127645471998e11dc9ab909a084bf07b79854af01486765b57e4c74a65de8",
+      "hash": "bc7a95d783989cb50018f8d7f5a678e150ee9fec6291d5e6a3b20e26cccfefee",
       "imports": [
         "io",
         "PIL",
@@ -583,14 +959,15 @@
     },
     {
       "path": "src/server.py",
-      "size_kb": 1.39,
-      "modified_time": 1759873661.8205862,
+      "size_kb": 2.48,
+      "modified_time": 1760020897.0681458,
       "type": "py",
       "purpose": "Health/metrics server",
       "role": "runtime",
-      "hash": "fc29bf5c1d5fca7052f5082c8c31d3f09141e716b92fed2240653c6320781f5d",
+      "hash": "5080cdccc8d5243b3320f04658f0328e43f3b177787cc1023f07667c17810e16",
       "imports": [
         "os",
+        "time",
         "uvicorn",
         "fastapi",
         "datetime",
@@ -602,18 +979,39 @@
       "is_duplicate": false
     },
     {
+      "path": "src/x_v2.py",
+      "size_kb": 15.24,
+      "modified_time": 1760024980.3285043,
+      "type": "py",
+      "purpose": "\"\"\"",
+      "role": "runtime",
+      "hash": "d9cae417a8de1cde7a4783c2c9363c35c2672a794042d29aa7a3ea83228a7d4a",
+      "imports": [
+        "time",
+        "requests",
+        "typing",
+        "dataclasses",
+        "requests_oauthlib",
+        "config"
+      ],
+      "is_entrypoint": false,
+      "is_large_asset": false,
+      "is_dead": true,
+      "is_duplicate": false
+    },
+    {
       "path": "src/twitter_factory.py",
-      "size_kb": 0.49,
-      "modified_time": 1759870592.805804,
+      "size_kb": 0.84,
+      "modified_time": 1760023367.7038333,
       "type": "py",
       "purpose": "Twitter/X API client",
       "role": "runtime",
-      "hash": "2b82bd3dc3554c0bba97736b739d569df98d265523de782fa265d761b284bd7c",
+      "hash": "c8265ad5acda921646096893537e8ec55ff969e13458c7953a7a661db7cd767b",
       "imports": [
         "config",
-        "twitter_client_live",
-        "twitter_client_dryrun",
-        "twitter_client_mock"
+        "twitter_client_v2_new",
+        "twitter_client_dryrun_v2",
+        "twitter_client_mock_v2"
       ],
       "is_entrypoint": false,
       "is_large_asset": false,
@@ -622,15 +1020,14 @@
     },
     {
       "path": "src/config.py",
-      "size_kb": 3.96,
-      "modified_time": 1759883961.0661123,
+      "size_kb": 3.81,
+      "modified_time": 1760024790.8112435,
       "type": "py",
       "purpose": "Configuration management",
       "role": "runtime",
-      "hash": "d1b06ae56113a6337f3cfb8ff7328058fd70e045f1fda458f329da17384737a4",
+      "hash": "f9135de886ade4c65ece9618061da5b818c421b9b6e3a56ecd00a461c00ad9df",
       "imports": [
         "os",
-        "logging",
         "typing",
         "dotenv"
       ],
@@ -640,20 +1037,37 @@
       "is_duplicate": false
     },
     {
-      "path": "src/twitter_client_live.py",
-      "size_kb": 6.01,
-      "modified_time": 1759888263.8133032,
+      "path": "src/twitter_client_dryrun_v2.py",
+      "size_kb": 5.38,
+      "modified_time": 1759971536.1889112,
       "type": "py",
       "purpose": "Twitter/X API client",
       "role": "runtime",
-      "hash": "825c8377e083f4406c4c33f27c4267d0f88ad4509859aa1e465f218bf7e52250",
+      "hash": "d4cfa440d445fe634b86a1922bb82082ea3bd7bf326bbd09d7ac0ebec5598282",
       "imports": [
-        "io",
         "json",
         "os",
         "time",
-        "requests",
-        "tweepy",
+        "typing",
+        "dataclasses",
+        "config"
+      ],
+      "is_entrypoint": false,
+      "is_large_asset": false,
+      "is_dead": true,
+      "is_duplicate": false
+    },
+    {
+      "path": "src/per_user_limiter.py",
+      "size_kb": 1.18,
+      "modified_time": 1760024790.8112156,
+      "type": "py",
+      "purpose": "Unknown purpose",
+      "role": "runtime",
+      "hash": "03a17948697e5f1a72401584b3f765baa4dc31ad77e4c9f59bd2384c9b5e4f9c",
+      "imports": [
+        "time",
+        "collections",
         "typing",
         "config"
       ],
@@ -664,12 +1078,12 @@
     },
     {
       "path": "src/rate_limiter.py",
-      "size_kb": 2.08,
-      "modified_time": 1759710968.2301714,
+      "size_kb": 2.44,
+      "modified_time": 1760020897.1557841,
       "type": "py",
       "purpose": "\"\"\"",
       "role": "runtime",
-      "hash": "ef80944d24261e9e11a12c86b7066eaf1d738a003488d23171882881b5de46cb",
+      "hash": "fb4862b3a9d529fb9b92b7a97b11acc0fedf89cd6886bc9d9fb437a1618c9fc3",
       "imports": [
         "time",
         "collections",
@@ -696,19 +1110,17 @@
       "is_duplicate": false
     },
     {
-      "path": "src/twitter_client_mock.py",
-      "size_kb": 3.86,
-      "modified_time": 1759888270.9386787,
+      "path": "src/ratelimit.py",
+      "size_kb": 5.26,
+      "modified_time": 1760020897.3941436,
       "type": "py",
-      "purpose": "Twitter/X API client",
+      "purpose": "\"\"\"",
       "role": "runtime",
-      "hash": "61b54a30c9f98642ab4330ee7618c929fa7163741abc7b706d89f518046e1053",
+      "hash": "98e7b88ca5e2cecfec8c0ac29fa131aff5f45f34f08c2d9734354230b0a21272",
       "imports": [
-        "json",
-        "os",
-        "time",
         "time",
         "typing",
+        "dataclasses",
         "config"
       ],
       "is_entrypoint": false,
@@ -717,20 +1129,25 @@
       "is_duplicate": false
     },
     {
-      "path": "src/retry.py",
-      "size_kb": 2.45,
-      "modified_time": 1759870590.6025062,
+      "path": "src/twitter_client_v2.py",
+      "size_kb": 25.14,
+      "modified_time": 1760020898.9455218,
       "type": "py",
-      "purpose": "\"\"\"",
+      "purpose": "Twitter/X API client",
       "role": "runtime",
-      "hash": "83107dee55d3fe946f688271dcb81280f08f3e671eda2b1eddce45b263670f9d",
+      "hash": "3254c01d86cb8b7b4f982e12bbef7ddc4f22c5c2561c0d966b75e4be9aa08e26",
       "imports": [
-        "logging",
-        "tweepy",
+        "io",
+        "json",
         "time",
-        "__future__",
+        "base64",
+        "requests",
+        "requests",
         "typing",
-        "tenacity"
+        "dataclasses",
+        "config",
+        "requests_oauthlib",
+        "requests.auth"
       ],
       "is_entrypoint": false,
       "is_large_asset": false,
@@ -738,13 +1155,55 @@
       "is_duplicate": false
     },
     {
-      "path": "src/utils.py",
-      "size_kb": 2.74,
-      "modified_time": 1759880573.0558424,
+      "path": "src/retry.py",
+      "size_kb": 2.29,
+      "modified_time": 1759971536.01719,
       "type": "py",
       "purpose": "\"\"\"",
       "role": "runtime",
-      "hash": "353ffc97bc0d1eb0adb7d030460338edf484d0ee99f838a045610bd8d3beab5e",
+      "hash": "9615e967b5e74eb611d8f1950b9294e00530d0cc50388c8c091398174b85641e",
+      "imports": [
+        "logging",
+        "time",
+        "__future__",
+        "typing",
+        "tenacity"
+      ],
+      "is_entrypoint": false,
+      "is_large_asset": false,
+      "is_dead": true,
+      "is_duplicate": false
+    },
+    {
+      "path": "src/auth_v2.py",
+      "size_kb": 6.85,
+      "modified_time": 1760020897.3772388,
+      "type": "py",
+      "purpose": "\"\"\"",
+      "role": "runtime",
+      "hash": "d36a678342668bbd9bd8f2776ede76fd2b420edc3fab07cad506c47ca627a5e9",
+      "imports": [
+        "json",
+        "os",
+        "time",
+        "requests",
+        "typing",
+        "dataclasses",
+        "config"
+      ],
+      "is_entrypoint": false,
+      "is_large_asset": false,
+      "is_dead": true,
+      "is_duplicate": false
+    },
+    {
+      "path": "src/utils.py",
+      "size_kb": 3.27,
+      "modified_time": 1759958203.1439333,
+      "type": "py",
+      "purpose": "\"\"\"",
+      "role": "runtime",
+      "hash": "850d67b62fedcf59addf787e5be6a38e1a47430b280fdad4f8db17c7253fa691",
       "imports": [
         "re",
         "typing"
@@ -755,13 +1214,35 @@
       "is_duplicate": false
     },
     {
+      "path": "src/twitter_client_v2_new.py",
+      "size_kb": 6.21,
+      "modified_time": 1760023367.7038105,
+      "type": "py",
+      "purpose": "Twitter/X API client",
+      "role": "runtime",
+      "hash": "9d16e7c528d6cccde1b033cc809cf2b2fbfd2064583b815c61b2f661436cba7c",
+      "imports": [
+        "time",
+        "typing",
+        "dataclasses",
+        "config",
+        "auth_v2",
+        "x_v2",
+        "ratelimit"
+      ],
+      "is_entrypoint": false,
+      "is_large_asset": false,
+      "is_dead": true,
+      "is_duplicate": false
+    },
+    {
       "path": "src/storage.py",
-      "size_kb": 1.13,
-      "modified_time": 1759875081.6121411,
+      "size_kb": 1.14,
+      "modified_time": 1759971536.2108383,
       "type": "py",
       "purpose": "\"\"\"",
       "role": "runtime",
-      "hash": "1137fcde9ed82a2a5262c8d078d936e917fa66dce42f795ebdd254ff8575f0a5",
+      "hash": "4c68042416ce2ff44dd998256ae2f8c3d3830a00052362f495d6a8494c899119",
       "imports": [
         "json",
         "os",
@@ -775,28 +1256,31 @@
     },
     {
       "path": "src/main.py",
-      "size_kb": 7.91,
-      "modified_time": 1759888257.0688357,
+      "size_kb": 12.82,
+      "modified_time": 1760024980.3285367,
       "type": "py",
       "purpose": "Main application entry point",
       "role": "runtime",
-      "hash": "38b5b115e1bb672a47ff97fae39a32be15240bdf570d4242a371e41ab714dce8",
+      "hash": "826264b7395ac3d898ad4d3788bb8fe378dfe4ac8b25a0fc23cc84c7aef5ecd5",
       "imports": [
         "time",
         "threading",
-        "logging",
-        "tweepy",
         "io",
         "uvicorn",
+        "random",
         "typing",
         "config",
         "twitter_factory",
         "image_processor",
         "rate_limiter",
+        "per_user_limiter",
         "storage",
         "utils",
         "pipeline.orchestrator",
         "PIL",
+        "server",
+        "server",
+        "server",
         "server"
       ],
       "is_entrypoint": true,
@@ -805,18 +1289,18 @@
       "is_duplicate": false
     },
     {
-      "path": "src/twitter_client_dryrun.py",
-      "size_kb": 3.85,
-      "modified_time": 1759888268.3688164,
+      "path": "src/twitter_client_mock_v2.py",
+      "size_kb": 5.51,
+      "modified_time": 1759971536.1999362,
       "type": "py",
       "purpose": "Twitter/X API client",
       "role": "runtime",
-      "hash": "19f0fb5f6e0ed603415b805a30a3fab33ab4c268f5d0c90f5f1952b3b79aea88",
+      "hash": "ff8cbb49be5466895de97af6716a03002756e9b3d34c53de55e15fee3469373b",
       "imports": [
         "json",
-        "os",
         "time",
         "typing",
+        "dataclasses",
         "config"
       ],
       "is_entrypoint": false,
@@ -826,17 +1310,18 @@
     },
     {
       "path": "src/pipeline/orchestrator.py",
-      "size_kb": 2.54,
-      "modified_time": 1759888253.750772,
+      "size_kb": 2.97,
+      "modified_time": 1760020897.0564513,
       "type": "py",
       "purpose": "Image processing orchestration",
       "role": "runtime",
-      "hash": "caf50a3c636a244df4e74a63b77ef63b1c2be564915d2d6af5bce65f72b3df6a",
+      "hash": "40e334af2804ce716233e0c54b33686a954aee5b4fa2d01f3a311664d23890b2",
       "imports": [
         "requests",
         "typing",
-        "src.image_processor",
-        "src.ai.nano_banana_client"
+        "image_processor",
+        "ai.nano_banana_client",
+        "ai.prompt_crybb"
       ],
       "is_entrypoint": false,
       "is_large_asset": false,
@@ -846,7 +1331,7 @@
     {
       "path": "src/ai/prompt_crybb.py",
       "size_kb": 0.45,
-      "modified_time": 1759881912.071522,
+      "modified_time": 1760023581.2342796,
       "type": "py",
       "purpose": "AI pipeline module",
       "role": "runtime",
@@ -859,270 +1344,420 @@
     },
     {
       "path": "src/ai/nano_banana_client.py",
-      "size_kb": 4.8,
-      "modified_time": 1759889900.3755794,
+      "size_kb": 4.65,
+      "modified_time": 1760020897.0455248,
       "type": "py",
       "purpose": "AI pipeline module",
       "role": "runtime",
-      "hash": "c00ab9c0bce32bdf3668cd87a8d9683aac2d2ff2f78f605f3c42b3a56ebe4216",
+      "hash": "22d79efc7877f619254ca11b6e4c4aa32083632aac9728d05fa06d7ad836ff5c",
       "imports": [
         "time",
         "requests",
-        "replicate",
-        "os",
-        "requests",
         "__future__",
         "typing",
-        "src.retry"
+        "retry"
       ],
       "is_entrypoint": false,
       "is_large_asset": false,
-      "is_dead": false,
+      "is_dead": true,
       "is_duplicate": false
     }
   ],
   "import_graph": {
-    "tools.run_diagnostics": [
-      "dotenv",
-      "src.pipeline.orchestrator",
-      "typing",
-      "requests",
-      "json",
-      "src.image_processor",
-      "importlib",
+    "test_auth": [
       "os",
-      "io",
-      "tools._diag_lib",
-      "traceback",
-      "datetime",
       "sys",
+      "src.twitter_client_v2"
+    ],
+    "test_mentions": [
+      "sys",
+      "src.twitter_client_v2"
+    ],
+    "debug_mentions": [
+      "sys",
+      "src.twitter_client_v2"
+    ],
+    "reset_since_id": [
+      "json",
+      "os"
+    ],
+    "tools.sleeper_probe": [
+      "os",
+      "sys",
+      "config",
+      "twitter_factory"
+    ],
+    "tools.run_diagnostics": [
+      "os",
+      "argparse",
+      "requests",
+      "importlib",
+      "datetime",
+      "typing",
+      "dotenv",
+      "tools._diag_lib",
       "src.config",
+      "json",
+      "io",
       "subprocess",
+      "src.image_processor",
       "src.rate_limiter",
-      "argparse"
+      "src.pipeline.orchestrator",
+      "sys",
+      "traceback"
+    ],
+    "tools.oauth2_pkce_callback_server": [
+      "os",
+      "secrets",
+      "pathlib",
+      "httpx",
+      "uvicorn",
+      "typing",
+      "hashlib",
+      "base64",
+      "dotenv",
+      "fastapi",
+      "urllib.parse",
+      "fastapi.responses",
+      "asyncio"
+    ],
+    "tools.test_media_upload": [
+      "os",
+      "requests",
+      "PIL",
+      "requests_oauthlib",
+      "dotenv",
+      "io"
     ],
     "tools.simulate_once": [
-      "dotenv",
-      "time",
-      "src.image_processor",
       "os",
-      "src.twitter_factory",
-      "sys",
+      "time",
+      "dotenv",
       "src.config",
-      "src.utils"
+      "src.image_processor",
+      "src.utils",
+      "src.twitter_factory",
+      "sys"
+    ],
+    "tools.verify_auth_paths": [
+      "os",
+      "requests",
+      "x_v2",
+      "datetime",
+      "base64",
+      "dotenv",
+      "json",
+      "io",
+      "config",
+      "sys"
     ],
     "tools.test_basic_plan": [
-      "tweepy",
-      "dotenv",
-      "typing",
-      "requests",
-      "json",
       "os",
-      "io",
+      "requests",
+      "tweepy",
+      "typing",
       "re",
+      "dotenv",
+      "json",
+      "io",
       "sys"
     ],
     "tools._audit_utils": [
-      "typing",
-      "json",
-      "pathlib",
-      "ast",
-      "time",
       "os",
-      "re",
+      "time",
+      "pathlib",
+      "typing",
       "hashlib",
+      "re",
+      "ast",
+      "json",
       "subprocess"
     ],
     "tools.run_ai_smoke": [
-      "dotenv",
-      "src.pipeline.orchestrator",
-      "requests",
       "os",
-      "sys",
+      "argparse",
       "src.config",
-      "argparse"
+      "dotenv",
+      "sys",
+      "src.pipeline.orchestrator"
     ],
     "tools.test_basic_api": [
-      "tweepy",
-      "dotenv",
-      "typing",
+      "os",
       "requests",
       "time",
-      "os",
-      "io",
+      "tweepy",
       "PIL",
-      "sys",
-      "subprocess"
-    ],
-    "tools._diag_lib": [
       "typing",
-      "shutil",
-      "json",
-      "time",
-      "os",
-      "contextlib",
-      "datetime",
+      "dotenv",
+      "io",
+      "subprocess",
       "sys"
     ],
-    "tools.probe_x_api": [
-      "tweepy",
-      "dotenv",
+    "tools.test_per_user_limiter": [
+      "os",
+      "time",
+      "per_user_limiter",
+      "config",
+      "sys"
+    ],
+    "tools.test_end_to_end_no_post": [
+      "os",
+      "x_v2",
+      "PIL",
+      "io",
+      "config",
+      "sys"
+    ],
+    "tools._diag_lib": [
+      "os",
+      "time",
+      "datetime",
       "typing",
+      "json",
+      "contextlib",
+      "shutil",
+      "sys"
+    ],
+    "tools.oauth2_store_tokens": [
+      "os",
+      "sys",
+      "dotenv",
+      "json"
+    ],
+    "tools.test_mention_parsing": [
+      "os",
+      "sys",
+      "utils",
+      "json"
+    ],
+    "tools.probe_x_api": [
+      "os",
       "requests",
       "time",
-      "os",
+      "tweepy",
+      "typing",
+      "dotenv",
       "io",
       "sys"
     ],
     "tools.repo_audit": [
+      "os",
+      "_audit_utils",
+      "argparse",
+      "pathlib",
       "typing",
       "json",
-      "_audit_utils",
+      "sys"
+    ],
+    "tools.diagnose_v2": [
       "os",
+      "argparse",
+      "pipeline.orchestrator",
+      "utils",
+      "typing",
+      "re",
+      "json",
+      "config",
+      "tempfile",
       "sys",
-      "pathlib",
-      "argparse"
+      "twitter_factory"
+    ],
+    "tools.mentions_probe": [
+      "os",
+      "x_v2",
+      "utils",
+      "datetime",
+      "dotenv",
+      "auth_v2",
+      "config",
+      "sys",
+      "traceback"
     ],
     "src.image_processor": [
-      "PIL",
+      "io",
       "config",
-      "io"
+      "PIL"
     ],
     "src.server": [
-      "config",
-      "fastapi",
       "os",
+      "time",
+      "uvicorn",
       "datetime",
-      "uvicorn"
+      "fastapi",
+      "config"
+    ],
+    "src.x_v2": [
+      "requests",
+      "time",
+      "requests_oauthlib",
+      "typing",
+      "config",
+      "dataclasses"
     ],
     "src.twitter_factory": [
-      "twitter_client_live",
-      "twitter_client_dryrun",
+      "twitter_client_mock_v2",
+      "twitter_client_dryrun_v2",
       "config",
-      "twitter_client_mock"
+      "twitter_client_v2_new"
     ],
     "src.config": [
-      "dotenv",
-      "logging",
-      "typing",
-      "os"
-    ],
-    "src.twitter_client_live": [
-      "tweepy",
-      "typing",
-      "requests",
-      "json",
-      "config",
-      "time",
       "os",
-      "io"
-    ],
-    "src.rate_limiter": [
-      "collections",
       "typing",
-      "config",
-      "time"
+      "dotenv"
     ],
-    "src.twitter_client_mock": [
+    "src.twitter_client_dryrun_v2": [
+      "os",
+      "time",
       "typing",
       "json",
       "config",
-      "time",
-      "os"
+      "dataclasses"
     ],
-    "src.retry": [
-      "tweepy",
-      "typing",
+    "src.per_user_limiter": [
+      "config",
+      "collections",
       "time",
-      "logging",
-      "tenacity",
-      "__future__"
-    ],
-    "src.utils": [
-      "re",
       "typing"
     ],
-    "src.storage": [
+    "src.rate_limiter": [
+      "config",
+      "collections",
+      "time",
+      "typing"
+    ],
+    "src.ratelimit": [
+      "config",
       "typing",
-      "os",
+      "time",
+      "dataclasses"
+    ],
+    "src.twitter_client_v2": [
+      "requests",
+      "time",
+      "requests_oauthlib",
+      "typing",
+      "base64",
       "json",
+      "io",
+      "requests.auth",
+      "config",
+      "dataclasses"
+    ],
+    "src.retry": [
+      "__future__",
+      "time",
+      "tenacity",
+      "typing",
+      "logging"
+    ],
+    "src.auth_v2": [
+      "os",
+      "requests",
+      "time",
+      "typing",
+      "json",
+      "config",
+      "dataclasses"
+    ],
+    "src.utils": [
+      "typing",
+      "re"
+    ],
+    "src.twitter_client_v2_new": [
+      "ratelimit",
+      "time",
+      "x_v2",
+      "typing",
+      "auth_v2",
+      "config",
+      "dataclasses"
+    ],
+    "src.storage": [
+      "json",
+      "os",
+      "typing",
       "config"
     ],
     "src.main": [
-      "tweepy",
+      "threading",
+      "server",
+      "time",
+      "pipeline.orchestrator",
+      "image_processor",
+      "PIL",
+      "storage",
+      "utils",
+      "uvicorn",
       "typing",
       "rate_limiter",
-      "config",
-      "time",
-      "image_processor",
-      "logging",
-      "utils",
-      "storage",
-      "server",
+      "per_user_limiter",
       "io",
-      "threading",
-      "twitter_factory",
-      "PIL",
-      "pipeline.orchestrator",
-      "uvicorn"
+      "random",
+      "config",
+      "twitter_factory"
     ],
-    "src.twitter_client_dryrun": [
+    "src.twitter_client_mock_v2": [
+      "time",
       "typing",
       "json",
       "config",
-      "time",
-      "os"
+      "dataclasses"
     ],
     "src.pipeline.orchestrator": [
-      "src.ai.nano_banana_client",
-      "typing",
       "requests",
-      "src.image_processor"
+      "typing",
+      "ai.nano_banana_client",
+      "ai.prompt_crybb",
+      "image_processor"
     ],
     "src.ai.nano_banana_client": [
-      "replicate",
-      "typing",
+      "__future__",
       "requests",
       "time",
-      "os",
-      "src.retry",
-      "__future__"
+      "typing",
+      "retry"
     ]
   },
   "requirements": {
-    "tweepy": "4.14.0",
     "requests": "2.32.3",
+    "requests-oauthlib>=1.3.1": "",
     "Pillow": "10.3.0",
     "python-dotenv": "1.0.1",
     "fastapi": "0.112.2",
     "uvicorn": "0.30.6",
     "tenacity": "8.5.0",
-    "replicate": "0.25.1"
+    "httpx": "0.27.0"
   },
   "environment_variables": [
-    "FIXTURES_DIR",
-    "CRYBB_STYLE_URL",
-    "TWITTER_MODE",
-    "CLIENT_ID",
-    "REPLICATE_API_TOKEN",
-    "REPLICATE_POLL_INTERVAL_SECS",
-    "AI_MAX_CONCURRENCY",
-    "API_SECRET",
-    "REPLICATE_MODEL",
-    "HTTP_TIMEOUT_SECS",
     "ACCESS_SECRET",
-    "API_KEY",
-    "POLL_SECONDS",
+    "AWAKE_MAX_SECS",
+    "AI_MAX_CONCURRENCY",
+    "PER_USER_HOURLY_LIMIT",
+    "FIXTURES_DIR",
+    "RT_LIKE_THRESHOLD",
     "SKIP_CONFIG_VALIDATION",
-    "CLIENT_SECRET",
-    "IMAGE_PIPELINE",
-    "BEARER_TOKEN",
-    "BOT_HANDLE",
-    "REPLICATE_TIMEOUT_SECS",
-    "AI_MAX_ATTEMPTS",
-    "PORT",
     "ACCESS_TOKEN",
-    "OUTBOX_DIR"
+    "IMAGE_PIPELINE",
+    "AI_MAX_ATTEMPTS",
+    "SLEEPER_MIN_SECS",
+    "API_SECRET",
+    "REPLICATE_POLL_INTERVAL_SECS",
+    "REPLICATE_API_TOKEN",
+    "PORT",
+    "POLL_SECONDS",
+    "REPLICATE_MODEL",
+    "REPLICATE_TIMEOUT_SECS",
+    "TWITTER_MODE",
+    "CRYBB_STYLE_URL",
+    "OUTBOX_DIR",
+    "BEARER_TOKEN",
+    "WHITELIST_HANDLES",
+    "HTTP_TIMEOUT_SECS",
+    "AWAKE_MIN_SECS",
+    "API_KEY",
+    "BOT_HANDLE",
+    "CLIENT_SECRET",
+    "CLIENT_ID"
   ],
   "makefile_targets": [
     "run",
@@ -1139,21 +1774,56 @@
   ],
   "docker_info": {},
   "analysis": {
-    "total_files": 48,
-    "dead_files": 4,
+    "total_files": 73,
+    "dead_files": 12,
     "duplicate_files": 0,
     "large_files": 0,
-    "total_size_kb": 183.79999999999998
+    "total_size_kb": 378.4699999999999
   },
   "recommendations": [
     {
       "action": "Remove",
-      "path": "src/twitter_client_live.py",
+      "path": "debug_mentions.py",
       "reason": "Unused module - no imports or entrypoint"
     },
     {
       "action": "Remove",
-      "path": "src/twitter_client_mock.py",
+      "path": "reset_since_id.py",
+      "reason": "Unused module - no imports or entrypoint"
+    },
+    {
+      "action": "Remove",
+      "path": "src/x_v2.py",
+      "reason": "Unused module - no imports or entrypoint"
+    },
+    {
+      "action": "Remove",
+      "path": "src/twitter_client_dryrun_v2.py",
+      "reason": "Unused module - no imports or entrypoint"
+    },
+    {
+      "action": "Remove",
+      "path": "src/per_user_limiter.py",
+      "reason": "Unused module - no imports or entrypoint"
+    },
+    {
+      "action": "Remove",
+      "path": "src/ratelimit.py",
+      "reason": "Unused module - no imports or entrypoint"
+    },
+    {
+      "action": "Remove",
+      "path": "src/retry.py",
+      "reason": "Unused module - no imports or entrypoint"
+    },
+    {
+      "action": "Remove",
+      "path": "src/auth_v2.py",
+      "reason": "Unused module - no imports or entrypoint"
+    },
+    {
+      "action": "Remove",
+      "path": "src/twitter_client_v2_new.py",
       "reason": "Unused module - no imports or entrypoint"
     },
     {
@@ -1163,7 +1833,12 @@
     },
     {
       "action": "Remove",
-      "path": "src/twitter_client_dryrun.py",
+      "path": "src/twitter_client_mock_v2.py",
+      "reason": "Unused module - no imports or entrypoint"
+    },
+    {
+      "action": "Remove",
+      "path": "src/ai/nano_banana_client.py",
       "reason": "Unused module - no imports or entrypoint"
     }
   ]

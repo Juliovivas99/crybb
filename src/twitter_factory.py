@@ -1,6 +1,6 @@
 """
 Factory to instantiate the appropriate Twitter client v2 based on TWITTER_MODE.
-Uses the new v2 clients with OAuth 2.0 authentication.
+Uses Bearer for reads and OAuth1a for writes in live mode.
 """
 from config import Config
 from twitter_client_v2_new import TwitterClientV2New
@@ -13,7 +13,7 @@ def make_twitter_client():
     Create appropriate Twitter client v2 based on mode.
     
     Modes:
-    - live: Uses TwitterClientV2New with OAuth 2.0 authentication
+    - live: Uses TwitterClientV2New (Bearer reads, OAuth1a writes)
     - dryrun: Uses TwitterClientDryRunV2 that writes to outbox
     - mock: Uses TwitterClientMockV2 for testing with mock data
     """

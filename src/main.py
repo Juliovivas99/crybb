@@ -9,6 +9,7 @@ from config import Config
 from twitter_factory import make_twitter_client
 from image_processor import ImageProcessor
 from rate_limiter import RateLimiter
+from per_user_limiter import PerUserLimiter, normalize
 from storage import Storage
 from utils import (
     extract_target_after_bot,
@@ -29,6 +30,9 @@ class CryBBBot:
         self.orchestrator = Orchestrator(Config)
         self.rate_limiter = RateLimiter()
         self.storage = Storage()
+        self.user_limiter = PerUserLimiter(Config.PER_USER_HOURLY_LIMIT, 3600)
+        self.sleeper_mode = False
+        self.last_retweeted_id = None
         
         # Get bot identity
         self.bot_id, self.bot_handle = self.twitter_client.get_bot_identity()
@@ -74,6 +78,15 @@ class CryBBBot:
             target_username = extract_target_after_bot(tweet_data, Config.BOT_HANDLE, author_username or "")
             
             print(f"Target chosen: @{target_username}")
+            # Per-user limiter with whitelist bypass
+            if normalize(target_username) in Config.WHITELIST_HANDLES:
+                print(f"Whitelist bypass for @{target_username} (no per-user cap).")
+            else:
+                if not self.user_limiter.allow(target_username):
+                    print(f"Per-user limit reached for @{target_username}; skipping.")
+                    return
+                else:
+                    print(f"Per-user count @{target_username} = {self.user_limiter.count(target_username)} in last hour")
             
             # Get target user and profile image - try expanded data first
             target_user_data = None
@@ -187,11 +200,16 @@ class CryBBBot:
                 
                 # Fetch mentions
                 mentions = self.twitter_client.get_mentions(since_id)
+
+                # If rate-limited marker, skip processing and sleeping handled by client
+                if isinstance(mentions, dict) and mentions.get("rate_limited"):
+                    # Do not change mode, just continue loop
+                    continue
                 
                 if mentions:
                     print(f"Found {len(mentions)} mentions")
                     
-                    # Process mentions (oldest first)
+                # Process mentions (oldest first)
                     for mention in mentions:
                         self.process_mention(mention)
                         since_id = mention['id']  # Updated for dict interface
@@ -205,13 +223,62 @@ class CryBBBot:
                 else:
                     print("No new mentions found")
                 
-                # Smart polling based on activity
-                if mentions:
-                    wait_time = 5 * 60   # 5 minutes when active
+                # Mode & sleeper tracking
+                self.sleeper_mode = (len(mentions) == 0)
+                print(f"Mode set to {'sleeper' if self.sleeper_mode else 'awake'}; mentions_count={len(mentions)}")
+
+                # Sleeper-mode retweet if quiet
+                if self.sleeper_mode:
+                    try:
+                        bot_id, bot_handle = self.twitter_client.get_bot_identity()
+                        tweets = self.twitter_client.get_user_tweets(bot_id, max_results=20)
+                        if isinstance(tweets, dict) and tweets.get("rate_limited"):
+                            # Skip RT this cycle if timeline is rate-limited
+                            pass
+                        else:
+                            tweets_list = tweets if isinstance(tweets, list) else (tweets or [])
+                            candidate = None
+                            likes_for_log = 0
+                            for t in tweets_list:
+                                metrics = t.get('public_metrics') or {}
+                                likes = metrics.get('like_count', 0)
+                                if likes >= Config.RT_LIKE_THRESHOLD:
+                                    if t.get('id') != self.last_retweeted_id:
+                                        candidate = t
+                                        likes_for_log = likes
+                                        break
+                            if candidate:
+                                try:
+                                    r = self.twitter_client.retweet_v11(candidate['id'])
+                                    if isinstance(r, dict) and r.get("rate_limited"):
+                                        # Skip if retweet route is rate-limited
+                                        pass
+                                    else:
+                                        self.last_retweeted_id = candidate['id']
+                                        print(f"Retweeted sleeper candidate {candidate['id']} (likes={likes_for_log}).")
+                                except Exception as e:
+                                    print(f"Retweet failed for {candidate['id']}: {e}")
+                            else:
+                                print("No sleeper RT candidate (>= like threshold) found.")
+                    except Exception as e:
+                        print(f"Sleeper RT logic error: {e}")
+
+                # Adaptive polling with jitter (non-429 path)
+                import random
+                # If mentions route remaining <= 1, sleep until reset+5s
+                rl = self.twitter_client.get_rate_limit_status() or {}
+                mentions_rl = rl.get('users/mentions')
+                if mentions_rl and isinstance(mentions_rl.get('remaining'), int) and mentions_rl.get('remaining') <= 1:
+                    now = time.time()
+                    reset_ts = mentions_rl.get('reset', int(now))
+                    wait = max(0, reset_ts - int(now)) + 5
                 else:
-                    wait_time = 30 * 60  # 30 minutes when quiet
-                print(f"Waiting {wait_time} seconds before next poll")
-                time.sleep(wait_time)
+                    if self.sleeper_mode:
+                        wait = random.randint(480, 600)
+                    else:
+                        wait = random.randint(Config.AWAKE_MIN_SECS, Config.AWAKE_MAX_SECS)
+                print(f"Next poll in {wait}s (mode={'sleeper' if self.sleeper_mode else 'awake'}).")
+                time.sleep(wait)
                 
             except Exception as e:
                 consecutive_errors += 1

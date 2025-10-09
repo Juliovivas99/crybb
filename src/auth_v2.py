@@ -188,3 +188,4 @@ def create_user_session() -> UserSession:
         refresh_token=Config.OAUTH2_USER_REFRESH_TOKEN,
         token_url=Config.OAUTH2_TOKEN_URL
     )
+

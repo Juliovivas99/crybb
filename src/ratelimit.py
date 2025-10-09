@@ -142,3 +142,4 @@ class RateLimiter:
     def reset_poll_interval(self) -> None:
         """Reset polling interval to base value."""
         self._current_poll_seconds = self._base_poll_seconds
+

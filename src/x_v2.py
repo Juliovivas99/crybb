@@ -6,7 +6,6 @@ import time
 import requests
 from typing import Optional, Dict, List, Any, Tuple
 from dataclasses import dataclass
-from auth_v2 import BearerSession, UserSession
 from requests_oauthlib import OAuth1
 from config import Config
 
@@ -28,13 +27,27 @@ class RateLimitInfo:
     reset: int
 
 
+def bearer_headers() -> Dict[str, str]:
+    return {
+        "Authorization": f"Bearer {Config.BEARER_TOKEN}",
+        "Content-Type": "application/json",
+    }
+
+
+def oauth1_auth() -> OAuth1:
+    return OAuth1(
+        Config.API_KEY,
+        Config.API_SECRET,
+        Config.ACCESS_TOKEN,
+        Config.ACCESS_SECRET,
+    )
+
+
 class XAPIv2Client:
     """X API v2 client with intelligent caching and rate limiting."""
     
-    def __init__(self, bearer_session: BearerSession, user_session: UserSession):
-        """Initialize with authentication sessions."""
-        self.bearer_session = bearer_session
-        self.user_session = user_session
+    def __init__(self):
+        """Initialize without OAuth2; use Bearer for reads and OAuth1a for writes."""
         self.base_url = "https://api.twitter.com/2"
         
         # Caching
@@ -94,20 +107,18 @@ class XAPIv2Client:
         print(f"auth={auth_type} {method} {url} status={status_code} remaining={remaining} reset={reset_time}")
     
     def _maybe_sleep(self, endpoint: str) -> None:
-        """Sleep if rate limit is low."""
+        """Sleep until reset+5s if remaining is low (default threshold 2)."""
+        self.maybe_sleep(endpoint, min_remaining=2)
+
+    def maybe_sleep(self, endpoint: str, min_remaining: int = 2) -> None:
         if endpoint not in self._rate_limits:
             return
-        
         rate_info = self._rate_limits[endpoint]
-        current_time = time.time()
-        
-        # Sleep until reset + 5 seconds if remaining < 2
-        if rate_info.remaining < 2:
-            time_until_reset = rate_info.reset - current_time
-            if time_until_reset > 0:
-                sleep_time = time_until_reset + 5
-                print(f"⚠️  Rate limit low ({rate_info.remaining}/{rate_info.limit}), sleeping {sleep_time:.1f}s")
-                time.sleep(sleep_time)
+        if rate_info.remaining < min_remaining:
+            now = time.time()
+            wait = max(0.0, rate_info.reset - now) + 5.0
+            print(f"⚠️  Rate limit low for {endpoint} ({rate_info.remaining}/{rate_info.limit}), sleeping {wait:.1f}s until reset+5s")
+            time.sleep(wait)
     
     def get_me(self) -> Tuple[str, str]:
         """Get bot identity with indefinite caching."""
@@ -116,32 +127,27 @@ class XAPIv2Client:
             return self._bot_identity
         
         try:
-            url = f"{self.base_url}/users/me"
-            params = {
-                'user.fields': 'id,username,name'
-            }
-            
-            response = self.user_session.get(url, params=params)
-            self._capture_rate_limits(response, 'users/me')
-            self._log_request('OAuth2User', 'GET', url, response.status_code, 'users/me')
+            url = "https://api.twitter.com/1.1/account/verify_credentials.json"
+            response = requests.get(url, auth=self._oauth1(), timeout=30)
+            self._capture_rate_limits(response, 'account/verify_credentials')
+            self._log_request('OAuth1a', 'GET', url, response.status_code, 'account/verify_credentials')
             
             response.raise_for_status()
             data = response.json()
             
-            if 'data' in data:
-                bot_id = data['data']['id']
-                bot_username = data['data']['username']
-                
-                # Cache the result indefinitely
-                self._bot_identity = (bot_id, bot_username)
-                
-                print(f"Bot identity cached: @{bot_username} (ID: {bot_id})")
-                return self._bot_identity
+            bot_id = data['id_str']
+            bot_username = data['screen_name']
+            
+            # Cache the result indefinitely
+            self._bot_identity = (bot_id, bot_username)
+            
+            print(f"Bot identity cached via OAuth1a: @{bot_username} (ID: {bot_id})")
+            return self._bot_identity
             
         except Exception as e:
-            print(f"Error getting bot identity: {e}")
+            print(f"OAuth1a identity failed: {e}")
         
-        # Fallback
+        # Final fallback
         return "123456789", "crybbmaker"
     
     def get_user_by_username(self, username: str) -> Optional[UserInfo]:
@@ -157,7 +163,7 @@ class XAPIv2Client:
                 'user.fields': 'id,username,name,profile_image_url'
             }
             
-            response = self.bearer_session.get(url, params=params)
+            response = requests.get(url, headers=bearer_headers(), params=params, timeout=30)
             self._capture_rate_limits(response, 'users/by/username')
             self._log_request('Bearer', 'GET', url, response.status_code, 'users/by/username')
             
@@ -183,7 +189,7 @@ class XAPIv2Client:
         return None
     
     def get_mentions(self, user_id: str, since_id: Optional[str] = None, 
-                    max_results: int = 100) -> List[Dict[str, Any]]:
+                    max_results: int = 100) -> List[Dict[str, Any]] | Dict[str, Any]:
         """Get mentions with comprehensive expansions."""
         try:
             url = f"{self.base_url}/users/{user_id}/mentions"
@@ -197,10 +203,20 @@ class XAPIv2Client:
             if since_id:
                 params['since_id'] = since_id
             
-            response = self.bearer_session.get(url, params=params)
+            response = requests.get(url, headers=bearer_headers(), params=params, timeout=30)
             self._capture_rate_limits(response, 'users/mentions')
             self._log_request('Bearer', 'GET', url, response.status_code, 'users/mentions')
-            
+
+            if response.status_code == 429:
+                # Rate limited: sleep until reset + 5s and return marker
+                rate = self._rate_limits.get('users/mentions')
+                if rate:
+                    now = time.time()
+                    wait = max(0.0, rate.reset - now) + 5.0
+                    print(f"Mentions rate-limited; sleeping {wait:.1f}s until reset+5s")
+                    time.sleep(wait)
+                return {"rate_limited": True, "route": "users/mentions"}
+
             response.raise_for_status()
             data = response.json()
             
@@ -309,7 +325,7 @@ class XAPIv2Client:
             
             response = requests.post(url, json=data, auth=self._oauth1(), timeout=30)
             self._capture_rate_limits(response, 'tweets')
-            self._log_request('User', 'POST', url, response.status_code, 'tweets')
+            self._log_request('OAuth1a', 'POST', url, response.status_code, 'tweets')
             
             response.raise_for_status()
             result = response.json()
@@ -357,3 +373,32 @@ class XAPIv2Client:
                 'reset_time': time.ctime(rate_info.reset)
             }
         return status
+
+    # Sleeper helpers
+    def get_user_tweets(self, user_id: str, max_results: int = 10) -> List[Dict[str, Any]]:
+        """Fetch recent tweets for a user via v2 (Bearer)."""
+        try:
+            url = f"{self.base_url}/users/{user_id}/tweets"
+            params = {
+                'max_results': str(max(5, min(max_results, 100))),
+                'tweet.fields': 'public_metrics,created_at'
+            }
+            r = requests.get(url, headers=bearer_headers(), params=params, timeout=30)
+            self._capture_rate_limits(r, 'users/tweets')
+            self._log_request('Bearer', 'GET', url, r.status_code, 'users/tweets')
+            r.raise_for_status()
+            return r.json().get('data', []) or []
+        except Exception as e:
+            print(f"Error fetching user tweets for {user_id}: {e}")
+            return []
+
+    def retweet_v11(self, tweet_id: str) -> Dict[str, Any] | Dict[str, Any]:
+        """Retweet via v1.1 statuses/retweet/<id>.json with OAuth1a."""
+        url = f"https://api.twitter.com/1.1/statuses/retweet/{tweet_id}.json"
+        r = requests.post(url, auth=self._oauth1(), timeout=30)
+        self._capture_rate_limits(r, 'statuses/retweet')
+        self._log_request('OAuth1a', 'POST', url, r.status_code, 'statuses/retweet')
+        if r.status_code == 429:
+            return {"rate_limited": True, "route": "statuses/retweet"}
+        r.raise_for_status()
+        return r.json()
