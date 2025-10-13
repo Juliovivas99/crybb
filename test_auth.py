@@ -7,14 +7,14 @@ import sys
 sys.path.append('src')
 
 # Import with absolute path
-from src.twitter_client_v2 import TwitterClientV2
+from twitter_factory import make_twitter_client
 
 def test_authentication():
     print("🧪 Testing fixed Twitter API v2 authentication...")
     
     try:
         # Create client
-        client = TwitterClientV2()
+        client = make_twitter_client()
         print("✅ Client created successfully")
         
         # Test bot identity (this will test OAuth 2.0 Bearer Token)

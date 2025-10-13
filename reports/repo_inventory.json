@@ -72,7 +72,7 @@
     {
       "path": "requirements.txt",
       "size_kb": 0.14,
-      "modified_time": 1760020897.4724228,
+      "modified_time": 1760368385.8531518,
       "type": "txt",
       "purpose": "Python dependencies",
       "role": "config",
@@ -323,7 +323,7 @@
     {
       "path": "env.example",
       "size_kb": 0.81,
-      "modified_time": 1760024980.3285503,
+      "modified_time": 1760027506.7708843,
       "type": "example",
       "purpose": "# OAuth 1.0a credentials (required for media upload v1.1 endpoint)",
       "role": "unknown",
@@ -396,7 +396,7 @@
     {
       "path": "tools/oauth2_pkce_callback_server.py",
       "size_kb": 12.82,
-      "modified_time": 1760020897.1448734,
+      "modified_time": 1760368385.2377958,
       "type": "py",
       "purpose": "Development tool/diagnostics",
       "role": "dev-tool",
@@ -591,7 +591,7 @@
     {
       "path": "tools/test_per_user_limiter.py",
       "size_kb": 0.93,
-      "modified_time": 1760024980.3285875,
+      "modified_time": 1760027506.7709308,
       "type": "py",
       "purpose": "Development tool/diagnostics",
       "role": "dev-tool",
@@ -611,7 +611,7 @@
     {
       "path": "tools/test_end_to_end_no_post.py",
       "size_kb": 4.42,
-      "modified_time": 1760020897.1944432,
+      "modified_time": 1760368385.831182,
       "type": "py",
       "purpose": "Development tool/diagnostics",
       "role": "dev-tool",
@@ -980,12 +980,12 @@
     },
     {
       "path": "src/x_v2.py",
-      "size_kb": 15.24,
-      "modified_time": 1760024980.3285043,
+      "size_kb": 15.85,
+      "modified_time": 1760027506.7710772,
       "type": "py",
       "purpose": "\"\"\"",
       "role": "runtime",
-      "hash": "d9cae417a8de1cde7a4783c2c9363c35c2672a794042d29aa7a3ea83228a7d4a",
+      "hash": "cfb572c3930fb48d829cf74531850580642acdaf59ca45ca7acb40b0d82299a8",
       "imports": [
         "time",
         "requests",
@@ -1021,7 +1021,7 @@
     {
       "path": "src/config.py",
       "size_kb": 3.81,
-      "modified_time": 1760024790.8112435,
+      "modified_time": 1760027506.7708976,
       "type": "py",
       "purpose": "Configuration management",
       "role": "runtime",
@@ -1079,7 +1079,7 @@
     {
       "path": "src/rate_limiter.py",
       "size_kb": 2.44,
-      "modified_time": 1760020897.1557841,
+      "modified_time": 1760368385.692649,
       "type": "py",
       "purpose": "\"\"\"",
       "role": "runtime",
@@ -1215,18 +1215,18 @@
     },
     {
       "path": "src/twitter_client_v2_new.py",
-      "size_kb": 6.21,
-      "modified_time": 1760023367.7038105,
+      "size_kb": 5.53,
+      "modified_time": 1760027506.771015,
       "type": "py",
       "purpose": "Twitter/X API client",
       "role": "runtime",
-      "hash": "9d16e7c528d6cccde1b033cc809cf2b2fbfd2064583b815c61b2f661436cba7c",
+      "hash": "6410d6e85491d55c9745dc4425bb5e866054ef70e954d4e807874483ce04b9d3",
       "imports": [
         "time",
+        "requests",
         "typing",
         "dataclasses",
         "config",
-        "auth_v2",
         "x_v2",
         "ratelimit"
       ],
@@ -1256,12 +1256,12 @@
     },
     {
       "path": "src/main.py",
-      "size_kb": 12.82,
-      "modified_time": 1760024980.3285367,
+      "size_kb": 14.18,
+      "modified_time": 1760027506.7730925,
       "type": "py",
       "purpose": "Main application entry point",
       "role": "runtime",
-      "hash": "826264b7395ac3d898ad4d3788bb8fe378dfe4ac8b25a0fc23cc84c7aef5ecd5",
+      "hash": "1829e5b94472040b2119fa2e00162fb27ba839b2d89276b06fb3784dbb8a89bd",
       "imports": [
         "time",
         "threading",
@@ -1370,153 +1370,153 @@
       "src.twitter_client_v2"
     ],
     "test_mentions": [
-      "sys",
-      "src.twitter_client_v2"
+      "src.twitter_client_v2",
+      "sys"
     ],
     "debug_mentions": [
-      "sys",
-      "src.twitter_client_v2"
+      "src.twitter_client_v2",
+      "sys"
     ],
     "reset_since_id": [
-      "json",
-      "os"
+      "os",
+      "json"
     ],
     "tools.sleeper_probe": [
       "os",
       "sys",
-      "config",
-      "twitter_factory"
+      "twitter_factory",
+      "config"
     ],
     "tools.run_diagnostics": [
-      "os",
+      "src.rate_limiter",
+      "json",
       "argparse",
-      "requests",
+      "tools._diag_lib",
+      "subprocess",
+      "src.pipeline.orchestrator",
+      "os",
+      "io",
+      "sys",
+      "traceback",
+      "dotenv",
+      "src.image_processor",
       "importlib",
+      "src.config",
       "datetime",
       "typing",
-      "dotenv",
-      "tools._diag_lib",
-      "src.config",
-      "json",
-      "io",
-      "subprocess",
-      "src.image_processor",
-      "src.rate_limiter",
-      "src.pipeline.orchestrator",
-      "sys",
-      "traceback"
+      "requests"
     ],
     "tools.oauth2_pkce_callback_server": [
+      "pathlib",
+      "hashlib",
+      "base64",
+      "fastapi",
+      "httpx",
+      "asyncio",
       "os",
       "secrets",
-      "pathlib",
-      "httpx",
-      "uvicorn",
-      "typing",
-      "hashlib",
-      "base64",
       "dotenv",
-      "fastapi",
-      "urllib.parse",
       "fastapi.responses",
-      "asyncio"
+      "urllib.parse",
+      "typing",
+      "uvicorn"
     ],
     "tools.test_media_upload": [
-      "os",
-      "requests",
-      "PIL",
       "requests_oauthlib",
+      "os",
+      "io",
       "dotenv",
-      "io"
+      "PIL",
+      "requests"
     ],
     "tools.simulate_once": [
-      "os",
-      "time",
-      "dotenv",
-      "src.config",
-      "src.image_processor",
       "src.utils",
+      "os",
+      "sys",
+      "dotenv",
+      "time",
       "src.twitter_factory",
-      "sys"
+      "src.config",
+      "src.image_processor"
     ],
     "tools.verify_auth_paths": [
-      "os",
-      "requests",
       "x_v2",
-      "datetime",
-      "base64",
-      "dotenv",
       "json",
-      "io",
       "config",
-      "sys"
+      "base64",
+      "os",
+      "sys",
+      "io",
+      "dotenv",
+      "datetime",
+      "requests"
     ],
     "tools.test_basic_plan": [
-      "os",
-      "requests",
+      "json",
       "tweepy",
-      "typing",
+      "os",
+      "io",
+      "sys",
       "re",
       "dotenv",
-      "json",
-      "io",
-      "sys"
+      "typing",
+      "requests"
     ],
     "tools._audit_utils": [
-      "os",
-      "time",
       "pathlib",
-      "typing",
       "hashlib",
-      "re",
-      "ast",
       "json",
-      "subprocess"
+      "subprocess",
+      "ast",
+      "os",
+      "re",
+      "time",
+      "typing"
     ],
     "tools.run_ai_smoke": [
-      "os",
       "argparse",
-      "src.config",
-      "dotenv",
+      "src.pipeline.orchestrator",
+      "os",
       "sys",
-      "src.pipeline.orchestrator"
+      "dotenv",
+      "src.config"
     ],
     "tools.test_basic_api": [
-      "os",
-      "requests",
-      "time",
+      "subprocess",
       "tweepy",
+      "os",
+      "io",
+      "time",
+      "sys",
+      "dotenv",
       "PIL",
       "typing",
-      "dotenv",
-      "io",
-      "subprocess",
-      "sys"
+      "requests"
     ],
     "tools.test_per_user_limiter": [
-      "os",
-      "time",
-      "per_user_limiter",
       "config",
-      "sys"
+      "os",
+      "sys",
+      "time",
+      "per_user_limiter"
     ],
     "tools.test_end_to_end_no_post": [
-      "os",
       "x_v2",
-      "PIL",
-      "io",
       "config",
-      "sys"
+      "os",
+      "sys",
+      "io",
+      "PIL"
     ],
     "tools._diag_lib": [
-      "os",
-      "time",
-      "datetime",
-      "typing",
       "json",
       "contextlib",
       "shutil",
-      "sys"
+      "os",
+      "sys",
+      "time",
+      "datetime",
+      "typing"
     ],
     "tools.oauth2_store_tokens": [
       "os",
@@ -1527,78 +1527,78 @@
     "tools.test_mention_parsing": [
       "os",
       "sys",
-      "utils",
-      "json"
+      "json",
+      "utils"
     ],
     "tools.probe_x_api": [
-      "os",
-      "requests",
-      "time",
       "tweepy",
-      "typing",
-      "dotenv",
+      "os",
+      "sys",
       "io",
-      "sys"
+      "time",
+      "dotenv",
+      "typing",
+      "requests"
     ],
     "tools.repo_audit": [
-      "os",
+      "pathlib",
+      "json",
       "_audit_utils",
       "argparse",
-      "pathlib",
-      "typing",
-      "json",
-      "sys"
+      "os",
+      "sys",
+      "typing"
     ],
     "tools.diagnose_v2": [
-      "os",
-      "argparse",
-      "pipeline.orchestrator",
-      "utils",
-      "typing",
-      "re",
       "json",
+      "argparse",
+      "twitter_factory",
       "config",
+      "utils",
       "tempfile",
+      "os",
       "sys",
-      "twitter_factory"
+      "re",
+      "pipeline.orchestrator",
+      "typing"
     ],
     "tools.mentions_probe": [
-      "os",
       "x_v2",
-      "utils",
-      "datetime",
-      "dotenv",
-      "auth_v2",
       "config",
+      "utils",
+      "os",
       "sys",
-      "traceback"
+      "dotenv",
+      "traceback",
+      "datetime",
+      "auth_v2"
     ],
     "src.image_processor": [
       "io",
-      "config",
-      "PIL"
-    ],
-    "src.server": [
-      "os",
-      "time",
-      "uvicorn",
-      "datetime",
-      "fastapi",
+      "PIL",
       "config"
     ],
-    "src.x_v2": [
-      "requests",
-      "time",
-      "requests_oauthlib",
-      "typing",
+    "src.server": [
       "config",
-      "dataclasses"
+      "fastapi",
+      "os",
+      "time",
+      "datetime",
+      "uvicorn"
+    ],
+    "src.x_v2": [
+      "requests_oauthlib",
+      "config",
+      "time",
+      "typing",
+      "dataclasses",
+      "requests"
     ],
     "src.twitter_factory": [
+      "twitter_client_v2_new",
       "twitter_client_mock_v2",
       "twitter_client_dryrun_v2",
-      "config",
-      "twitter_client_v2_new"
+      "config"
     ],
     "src.config": [
       "os",
@@ -1606,115 +1606,115 @@
       "dotenv"
     ],
     "src.twitter_client_dryrun_v2": [
+      "json",
+      "config",
       "os",
       "time",
       "typing",
-      "json",
-      "config",
       "dataclasses"
     ],
     "src.per_user_limiter": [
-      "config",
-      "collections",
       "time",
-      "typing"
+      "typing",
+      "collections",
+      "config"
     ],
     "src.rate_limiter": [
-      "config",
-      "collections",
       "time",
-      "typing"
+      "typing",
+      "collections",
+      "config"
     ],
     "src.ratelimit": [
-      "config",
-      "typing",
       "time",
-      "dataclasses"
+      "typing",
+      "dataclasses",
+      "config"
     ],
     "src.twitter_client_v2": [
-      "requests",
-      "time",
-      "requests_oauthlib",
-      "typing",
-      "base64",
       "json",
-      "io",
-      "requests.auth",
+      "requests_oauthlib",
       "config",
-      "dataclasses"
+      "requests.auth",
+      "base64",
+      "time",
+      "io",
+      "typing",
+      "dataclasses",
+      "requests"
     ],
     "src.retry": [
-      "__future__",
       "time",
+      "logging",
       "tenacity",
       "typing",
-      "logging"
+      "__future__"
     ],
     "src.auth_v2": [
-      "os",
-      "requests",
-      "time",
-      "typing",
       "json",
       "config",
-      "dataclasses"
+      "os",
+      "time",
+      "typing",
+      "dataclasses",
+      "requests"
     ],
     "src.utils": [
-      "typing",
-      "re"
+      "re",
+      "typing"
     ],
     "src.twitter_client_v2_new": [
-      "ratelimit",
-      "time",
       "x_v2",
-      "typing",
-      "auth_v2",
+      "ratelimit",
       "config",
-      "dataclasses"
+      "time",
+      "typing",
+      "dataclasses",
+      "requests"
     ],
     "src.storage": [
-      "json",
       "os",
+      "json",
       "typing",
       "config"
     ],
     "src.main": [
-      "threading",
       "server",
-      "time",
-      "pipeline.orchestrator",
       "image_processor",
-      "PIL",
-      "storage",
-      "utils",
-      "uvicorn",
-      "typing",
-      "rate_limiter",
-      "per_user_limiter",
-      "io",
-      "random",
+      "twitter_factory",
       "config",
-      "twitter_factory"
+      "rate_limiter",
+      "utils",
+      "pipeline.orchestrator",
+      "uvicorn",
+      "time",
+      "io",
+      "storage",
+      "PIL",
+      "per_user_limiter",
+      "typing",
+      "random",
+      "threading"
     ],
     "src.twitter_client_mock_v2": [
-      "time",
-      "typing",
       "json",
       "config",
+      "time",
+      "typing",
       "dataclasses"
     ],
     "src.pipeline.orchestrator": [
-      "requests",
+      "image_processor",
+      "ai.prompt_crybb",
       "typing",
       "ai.nano_banana_client",
-      "ai.prompt_crybb",
-      "image_processor"
+      "requests"
     ],
     "src.ai.nano_banana_client": [
-      "__future__",
-      "requests",
       "time",
       "typing",
+      "__future__",
+      "requests",
       "retry"
     ]
   },
@@ -1729,35 +1729,35 @@
     "httpx": "0.27.0"
   },
   "environment_variables": [
-    "ACCESS_SECRET",
-    "AWAKE_MAX_SECS",
-    "AI_MAX_CONCURRENCY",
-    "PER_USER_HOURLY_LIMIT",
-    "FIXTURES_DIR",
-    "RT_LIKE_THRESHOLD",
-    "SKIP_CONFIG_VALIDATION",
-    "ACCESS_TOKEN",
-    "IMAGE_PIPELINE",
-    "AI_MAX_ATTEMPTS",
-    "SLEEPER_MIN_SECS",
-    "API_SECRET",
-    "REPLICATE_POLL_INTERVAL_SECS",
-    "REPLICATE_API_TOKEN",
-    "PORT",
-    "POLL_SECONDS",
-    "REPLICATE_MODEL",
-    "REPLICATE_TIMEOUT_SECS",
-    "TWITTER_MODE",
-    "CRYBB_STYLE_URL",
-    "OUTBOX_DIR",
-    "BEARER_TOKEN",
-    "WHITELIST_HANDLES",
-    "HTTP_TIMEOUT_SECS",
-    "AWAKE_MIN_SECS",
     "API_KEY",
-    "BOT_HANDLE",
+    "RT_LIKE_THRESHOLD",
+    "AWAKE_MAX_SECS",
+    "BEARER_TOKEN",
+    "AI_MAX_ATTEMPTS",
+    "PORT",
+    "CRYBB_STYLE_URL",
     "CLIENT_SECRET",
-    "CLIENT_ID"
+    "AWAKE_MIN_SECS",
+    "OUTBOX_DIR",
+    "TWITTER_MODE",
+    "REPLICATE_MODEL",
+    "REPLICATE_API_TOKEN",
+    "REPLICATE_TIMEOUT_SECS",
+    "HTTP_TIMEOUT_SECS",
+    "API_SECRET",
+    "WHITELIST_HANDLES",
+    "POLL_SECONDS",
+    "ACCESS_TOKEN",
+    "PER_USER_HOURLY_LIMIT",
+    "REPLICATE_POLL_INTERVAL_SECS",
+    "SLEEPER_MIN_SECS",
+    "ACCESS_SECRET",
+    "CLIENT_ID",
+    "IMAGE_PIPELINE",
+    "BOT_HANDLE",
+    "SKIP_CONFIG_VALIDATION",
+    "FIXTURES_DIR",
+    "AI_MAX_CONCURRENCY"
   ],
   "makefile_targets": [
     "run",
@@ -1778,7 +1778,7 @@
     "dead_files": 12,
     "duplicate_files": 0,
     "large_files": 0,
-    "total_size_kb": 378.4699999999999
+    "total_size_kb": 379.75999999999993
   },
   "recommendations": [
     {

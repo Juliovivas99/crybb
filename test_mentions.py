@@ -5,12 +5,12 @@ Test script to check if mentions are being fetched
 import sys
 sys.path.append('src')
 
-from src.twitter_client_v2 import TwitterClientV2
+from twitter_factory import make_twitter_client
 
 def test_mentions():
     print("🔍 Testing mentions fetch...")
     
-    client = TwitterClientV2()
+    client = make_twitter_client()
     
     # Get mentions
     mentions = client.get_mentions()

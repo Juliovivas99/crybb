@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 import sys
 sys.path.append('src')
-from src.twitter_client_v2 import TwitterClientV2
+from twitter_factory import make_twitter_client
 
 print('🔍 Testing mentions fetch...')
-client = TwitterClientV2()
+client = make_twitter_client()
 mentions = client.get_mentions()
 print(f'Found {len(mentions)} mentions')
 

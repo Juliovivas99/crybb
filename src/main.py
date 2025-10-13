@@ -141,8 +141,6 @@ class CryBBBot:
             from server import update_metrics
             update_metrics(processed=1, replies_sent=1, last_mention_time=tweet_data.get('created_at'))
             
-            print(f"Successfully processed mention {tweet_id}")
-            
         except Exception as e:
             print(f"Error processing mention {tweet_data.get('id', 'unknown')}: {e}")
             try:
@@ -209,13 +207,34 @@ class CryBBBot:
                 if mentions:
                     print(f"Found {len(mentions)} mentions")
                     
-                # Process mentions (oldest first)
-                    for mention in mentions:
-                        self.process_mention(mention)
-                        since_id = mention['id']  # Updated for dict interface
+                    # Get processed IDs to avoid duplicates
+                    processed_ids = self.storage.read_processed_ids()
                     
-                    # Save since_id
-                    self.storage.write_since_id(since_id)
+                    # Process mentions (oldest first) - skip already processed
+                    processed_count = 0
+                    for mention in mentions:
+                        tweet_id = mention['id']
+                        
+                        # Skip if already processed
+                        if self.storage.is_processed(tweet_id):
+                            print(f"⏩ Skipping already processed tweet {tweet_id}")
+                            continue
+                        
+                        # Process the mention
+                        self.process_mention(mention)
+                        
+                        # Mark as processed after successful processing
+                        self.storage.mark_processed(tweet_id)
+                        print(f"✅ Processed tweet {tweet_id}")
+                        
+                        # Update since_id after successful processing
+                        since_id = tweet_id
+                        processed_count += 1
+                    
+                    # Save since_id only if we processed any mentions
+                    if processed_count > 0:
+                        self.storage.write_since_id(since_id)
+                        print(f"📝 Updated since_id to {since_id} after processing {processed_count} mentions")
                     
                     # Reset backoff and error counters on successful processing
                     backoff_seconds = 1

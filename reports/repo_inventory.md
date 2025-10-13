@@ -49,7 +49,7 @@ Generated: /Users/juliovivas/Vscode/crybb
 | src/auth_v2.py | 6.85 | py | """ | runtime | DEAD |
 | src/config.py | 3.81 | py | Configuration management | runtime | - |
 | src/image_processor.py | 1.24 | py | """ | runtime | - |
-| src/main.py | 12.82 | py | Main application entry point | runtime | ENTRYPOINT |
+| src/main.py | 14.18 | py | Main application entry point | runtime | ENTRYPOINT |
 | src/per_user_limiter.py | 1.18 | py | Unknown purpose | runtime | DEAD |
 | src/pipeline/orchestrator.py | 2.97 | py | Image processing orchestration | runtime | - |
 | src/rate_limiter.py | 2.44 | py | """ | runtime | - |
@@ -60,10 +60,10 @@ Generated: /Users/juliovivas/Vscode/crybb
 | src/twitter_client_dryrun_v2.py | 5.38 | py | Twitter/X API client | runtime | DEAD |
 | src/twitter_client_mock_v2.py | 5.51 | py | Twitter/X API client | runtime | DEAD |
 | src/twitter_client_v2.py | 25.14 | py | Twitter/X API client | runtime | - |
-| src/twitter_client_v2_new.py | 6.21 | py | Twitter/X API client | runtime | DEAD |
+| src/twitter_client_v2_new.py | 5.53 | py | Twitter/X API client | runtime | DEAD |
 | src/twitter_factory.py | 0.84 | py | Twitter/X API client | runtime | - |
 | src/utils.py | 3.27 | py | """ | runtime | - |
-| src/x_v2.py | 15.24 | py | """ | runtime | DEAD |
+| src/x_v2.py | 15.85 | py | """ | runtime | DEAD |
 | test_auth.py | 1.37 | py | #!/usr/bin/env python3 | unknown | ENTRYPOINT |
 | test_mentions.py | 0.79 | py | #!/usr/bin/env python3 | unknown | ENTRYPOINT |
 | tools/_audit_utils.py | 9.71 | py | Development tool/diagnostics | dev-tool | ENTRYPOINT |
