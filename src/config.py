@@ -52,7 +52,7 @@ class Config:
     IMAGE_PIPELINE: str = os.getenv("IMAGE_PIPELINE", "ai")  # ai | placeholder
 
     # Adaptive polling and per-user limits
-    WHITELIST_HANDLES = set(os.getenv("WHITELIST_HANDLES", "thenighguy,crybaby_on_sol").lower().replace("@","" ).split(","))
+    WHITELIST_HANDLES = set(os.getenv("WHITELIST_HANDLES", "thenighguy,crybaby_on_sol,sudo_studio0x").lower().replace("@","" ).split(","))
     PER_USER_HOURLY_LIMIT: int = int(os.getenv("PER_USER_HOURLY_LIMIT", "12"))
     PER_TARGET_HOURLY_LIMIT: int = int(os.getenv("PER_TARGET_HOURLY_LIMIT", "5"))
     AWAKE_MIN_SECS: int = int(os.getenv("AWAKE_MIN_SECS", "180"))
