@@ -124,10 +124,21 @@ class CryBBBot:
                 author_verified = author_data.get('verified', False)
                 print(f"Using cached author data: @{author_username} (verified: {author_verified})")
                 
-                # Check if author is verified - only verified users can call the bot
-                if not author_verified:
-                    print(f"Skipping mention from non-verified user @{author_username}")
-                    return  # Skip processing silently for non-verified users
+                # DEBUG: Check verification and whitelist logic
+                normalized_username = normalize(author_username) if author_username else ""
+                is_whitelisted = normalized_username in Config.WHITELIST_HANDLES
+                print(f"[DEBUG] User: @{author_username}, Verified={author_verified}, "
+                      f"InWhitelist={is_whitelisted}, Whitelist={list(Config.WHITELIST_HANDLES)}")
+                
+                # Check if author is verified OR whitelisted
+                if not author_verified and not is_whitelisted:
+                    print(f"[DEBUG] Skipping mention from non-verified, non-whitelisted user @{author_username}")
+                    return  # Skip processing silently for non-verified, non-whitelisted users
+                else:
+                    if author_verified:
+                        print(f"[DEBUG] Processing mention from verified user @{author_username}")
+                    else:
+                        print(f"[DEBUG] Processing mention from whitelisted user @{author_username}")
             else:
                 # Fallback: get author info via API call (should rarely happen with proper expansions)
                 author = self.twitter_client.get_user_by_id(author_id)
@@ -135,10 +146,21 @@ class CryBBBot:
                 author_verified = author.verified if author else False
                 print(f"Fetched author data via API: @{author_username} (verified: {author_verified})")
                 
-                # Check if author is verified - only verified users can call the bot
-                if not author_verified:
-                    print(f"Skipping mention from non-verified user @{author_username}")
-                    return  # Skip processing silently for non-verified users
+                # DEBUG: Check verification and whitelist logic
+                normalized_username = normalize(author_username) if author_username else ""
+                is_whitelisted = normalized_username in Config.WHITELIST_HANDLES
+                print(f"[DEBUG] User: @{author_username}, Verified={author_verified}, "
+                      f"InWhitelist={is_whitelisted}, Whitelist={list(Config.WHITELIST_HANDLES)}")
+                
+                # Check if author is verified OR whitelisted
+                if not author_verified and not is_whitelisted:
+                    print(f"[DEBUG] Skipping mention from non-verified, non-whitelisted user @{author_username}")
+                    return  # Skip processing silently for non-verified, non-whitelisted users
+                else:
+                    if author_verified:
+                        print(f"[DEBUG] Processing mention from verified user @{author_username}")
+                    else:
+                        print(f"[DEBUG] Processing mention from whitelisted user @{author_username}")
             
             # Extract target using new robust method
             target_username = extract_target_after_bot(tweet_data, Config.BOT_HANDLE, author_username or "")
