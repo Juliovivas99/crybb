@@ -122,20 +122,23 @@ class CryBBBot:
                 # Use expanded author data from mentions response (no extra API call needed!)
                 author_data = tweet_data['author']
                 author_verified = author_data.get('verified', False)
-                print(f"Using cached author data: @{author_username} (verified: {author_verified})")
-                
-                # DEBUG: Check verification and whitelist logic
+                verified_type = author_data.get('verified_type')  # e.g., 'blue', 'business', 'government'
+                effective_verified = author_verified or (verified_type in {"blue", "business", "government"})
+
+                from src.per_user_limiter import normalize
                 normalized_username = normalize(author_username) if author_username else ""
                 is_whitelisted = normalized_username in Config.WHITELIST_HANDLES
+
                 print(f"[DEBUG] User: @{author_username}, Verified={author_verified}, "
+                      f"VerifiedType={verified_type}, EffectiveVerified={effective_verified}, "
                       f"InWhitelist={is_whitelisted}, Whitelist={list(Config.WHITELIST_HANDLES)}")
-                
-                # Check if author is verified OR whitelisted
-                if not author_verified and not is_whitelisted:
+
+                # Accept if verified (any type) or whitelisted
+                if not effective_verified and not is_whitelisted:
                     print(f"[DEBUG] Skipping mention from non-verified, non-whitelisted user @{author_username}")
-                    return  # Skip processing silently for non-verified, non-whitelisted users
+                    return
                 else:
-                    if author_verified:
+                    if effective_verified:
                         print(f"[DEBUG] Processing mention from verified user @{author_username}")
                     else:
                         print(f"[DEBUG] Processing mention from whitelisted user @{author_username}")
@@ -143,21 +146,25 @@ class CryBBBot:
                 # Fallback: get author info via API call (should rarely happen with proper expansions)
                 author = self.twitter_client.get_user_by_id(author_id)
                 author_username = author.username if author else None
-                author_verified = author.verified if author else False
-                print(f"Fetched author data via API: @{author_username} (verified: {author_verified})")
-                
-                # DEBUG: Check verification and whitelist logic
+                author_verified = (author.verified if author else False)
+                verified_type = getattr(author, 'verified_type', None)
+                effective_verified = author_verified or (verified_type in {"blue", "business", "government"})
+
+                from src.per_user_limiter import normalize
                 normalized_username = normalize(author_username) if author_username else ""
                 is_whitelisted = normalized_username in Config.WHITELIST_HANDLES
+                print(f"Fetched author data via API: @{author_username} (verified: {author_verified}, verified_type: {verified_type}, effective_verified: {effective_verified})")
+                
                 print(f"[DEBUG] User: @{author_username}, Verified={author_verified}, "
+                      f"VerifiedType={verified_type}, EffectiveVerified={effective_verified}, "
                       f"InWhitelist={is_whitelisted}, Whitelist={list(Config.WHITELIST_HANDLES)}")
                 
-                # Check if author is verified OR whitelisted
-                if not author_verified and not is_whitelisted:
+                # Accept if verified (any type) or whitelisted
+                if not effective_verified and not is_whitelisted:
                     print(f"[DEBUG] Skipping mention from non-verified, non-whitelisted user @{author_username}")
-                    return  # Skip processing silently for non-verified, non-whitelisted users
+                    return
                 else:
-                    if author_verified:
+                    if effective_verified:
                         print(f"[DEBUG] Processing mention from verified user @{author_username}")
                     else:
                         print(f"[DEBUG] Processing mention from whitelisted user @{author_username}")
