@@ -200,4 +200,26 @@ if __name__ == "__main__":
     test_hidden_mentions_ignored()
     test_self_block()
     test_aye_reply_skips()
+    test_reply_two_mentions_no_plus_required()
+    test_reply_three_mentions_with_plus()
+    test_reply_three_mentions_without_plus_skip()
+    test_multiple_bots_last_with_plus()
+    # new: top-level 3 mentions without plus should skip
+    def _run_toplevel_three_mentions_without_plus_skip():
+        t = "@crybbmaker @alice @extra"
+        tweet = {
+            "text": t,
+            "author_id": "111",
+            "entities": {"mentions": [
+                ent("crybbmaker", 0, 11, "bot"),
+                ent("alice", 12, 18, "222"),
+                ent("extra", 19, 25, "333"),
+            ]},
+            "includes": {"users": [inc("111", "author"), inc("222", "alice"), inc("333", "extra")]},
+        }
+        target, reason = extract_target_after_last_bot(tweet, "crybbmaker", "111", None)
+        assert target is None
+        assert reason == "require-plus-gap-missing"
+
+    _run_toplevel_three_mentions_without_plus_skip()
     print("✅ Extraction OK") 

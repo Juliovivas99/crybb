@@ -119,14 +119,13 @@ def extract_target_after_last_bot(
     nxt = typed[i + 1]
     gap = tlc[typed[i]["end"]:nxt["start"]]
 
-    # PLUS required **only** for replies with >= 3 typed mentions
-    is_reply = in_reply_to_user_id is not None
-    require_plus = is_reply and (len(typed) >= 3)
+    # STRICT: require '+' whenever there are 3+ typed mentions (top-level or reply)
+    require_plus = (len(typed) >= 3)
     if require_plus:
         if not re.fullmatch(r"[ \t\r\n]*\+[ \t\r\n]*", gap or ""):
             return None, "require-plus-gap-missing"
     else:
-        # otherwise allow whitespace or optional single '+'
+        # allow whitespace or optional single '+'
         if not re.fullmatch(r"[ \t\r\n]*\+?[ \t\r\n]*", gap or ""):
             return None, "gap-not-allowed"
 
