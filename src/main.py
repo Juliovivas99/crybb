@@ -13,6 +13,7 @@ from src.per_user_limiter import PerUserLimiter, normalize
 from src.storage import Storage
 from src.utils import (
     extract_target_after_bot,
+    extract_target_after_last_bot,
     normalize_pfp_url,
     format_friendly_message,
     format_rate_limit_message,
@@ -93,9 +94,22 @@ class CryBBBot:
             author_id = str(tweet_data.get('author_id', ''))
             tweet_text = tweet_data.get('text', '')
             tweet_id = tweet_data.get('id', '')
+            in_reply_to_user_id = tweet_data.get('in_reply_to_user_id')
             
             print(f"Processing mention from {author_id}: {tweet_text}")
             
+            # Debug log for mention processing context
+            entities = tweet_data.get('entities') or {}
+            mentions = entities.get('mentions') or []
+            print(f"[MENTION DEBUG] text=\"{tweet_text}\"\nmentions={mentions}\nauthor_id={author_id} in_reply_to_user_id={in_reply_to_user_id} bot_id={self.bot_id}")
+
+            # Require explicit typed @bot anywhere in text
+            bot_handle_lc = (self.bot_handle or Config.BOT_HANDLE).lstrip("@").lower()
+            txt_lc = (tweet_text or "").lower()
+            if f"@{bot_handle_lc}" not in txt_lc:
+                print("[SKIP] No explicit @bot in text; ignoring")
+                return
+
             # Get author username from batch snapshot for rate limiting
             author_username = None
             if 'author' in tweet_data:
@@ -169,10 +183,34 @@ class CryBBBot:
                     else:
                         print(f"[DEBUG] Processing mention from whitelisted user @{author_username}")
             
-            # Extract target using new robust method
-            target_username = extract_target_after_bot(tweet_data, Config.BOT_HANDLE, author_username or "")
-            
-            print(f"Target chosen: @{target_username}")
+            # Choose immediate next typed mention after the LAST @bot
+            target_username, reason = extract_target_after_last_bot(
+                tweet_data, bot_handle_lc, author_id, in_reply_to_user_id
+            )
+
+            # Prevent loops: replies to bot must include a valid @bot @target pair
+            is_reply_to_bot = (str(in_reply_to_user_id) == str(self.bot_id))
+            if is_reply_to_bot and not target_username:
+                print("[SKIP] Reply to bot without explicit @bot @target pair")
+                return
+
+            if not target_username:
+                print("[SKIP] No explicit @target after last @bot")
+                return
+
+            from src.per_user_limiter import normalize
+            if normalize(target_username) == normalize(Config.BOT_HANDLE):
+                print("[SKIP] Target is bot handle")
+                return
+            author_username_lc = (tweet_data.get('author') or {}).get('username') or ''
+            if author_username_lc.lower() == (target_username or "").lower():
+                print("[SKIP] Target is tweet author (self-PFP)")
+                return
+
+            if Config.DEBUG_MENTIONS:
+                au = (tweet_data.get('author') or {}).get('username') or ''
+                print(f'[MENTION DEBUG] id={tweet_id} reply_to={in_reply_to_user_id} '
+                      f'author=@{au} target=@{target_username} reason="{reason}" text="{tweet_text or ""}"')
             # Per-target limiter (no whitelist bypass - all users treated equally)
             if not self.user_limiter.allow(target_username):
                 print(f"Per-target limit reached for @{target_username}; skipping.")
@@ -192,6 +230,11 @@ class CryBBBot:
                 )
                 return
             
+            # Block self-PFP explicitly
+            if normalize(target_username) == normalize(Config.BOT_HANDLE):
+                print("[SKIP] Self-PFP attempt for bot handle; ignoring")
+                return
+
             pfp_url = normalize_pfp_url(target_user_data.get('profile_image_url') or "")
             print(f"PFP={pfp_url}")
             
@@ -216,7 +259,16 @@ class CryBBBot:
             
             # Reply with processed image
             reply_text = f"Here's your CryBB PFP @{target_username} 🍼"
-            self.twitter_client.reply_with_image(tweet_id, reply_text, image_bytes)
+            reply_result = self.twitter_client.reply_with_image(tweet_id, reply_text, image_bytes)
+            # Optional success log
+            try:
+                if reply_result and isinstance(reply_result, dict):
+                    new_tweet_id = reply_result.get('id') or reply_result.get('data', {}).get('id')
+                else:
+                    new_tweet_id = None
+                print(f"[REPLY OK] parent_id={tweet_id} reply_id={new_tweet_id or 'unknown'} target=@{target_username}")
+            except Exception:
+                pass
             
             # Update metrics
             from src.server import update_metrics

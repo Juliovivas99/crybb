@@ -59,6 +59,8 @@ class Config:
     AWAKE_MAX_SECS: int = int(os.getenv("AWAKE_MAX_SECS", "300"))
     SLEEPER_MIN_SECS: int = int(os.getenv("SLEEPER_MIN_SECS", "600"))
     RT_LIKE_THRESHOLD: int = int(os.getenv("RT_LIKE_THRESHOLD", "10"))
+    # Observability
+    DEBUG_MENTIONS: bool = bool(int(os.getenv("DEBUG_MENTIONS", "1")))
     
     @classmethod
     def validate(cls) -> None:
