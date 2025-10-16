@@ -1,7 +1,7 @@
 import time
 from collections import deque, defaultdict
 from typing import Deque, Dict
-from config import Config
+from src.config import Config
 
 
 def normalize(username: str) -> str:
@@ -22,9 +22,8 @@ class PerUserLimiter:
 
     def allow(self, username: str) -> bool:
         user_key = normalize(username)
-        if user_key in Config.WHITELIST_HANDLES:
-            return True
-
+        # No whitelist bypass - all users treated equally for outgoing replies
+        
         now = time.time()
         self._prune(user_key, now)
         dq = self.user_to_timestamps[user_key]

@@ -9,7 +9,7 @@ import time
 from typing import List
 import requests
 
-from retry import retry_http
+from src.retry import retry_http
 
 
 class AIGenerationError(Exception):

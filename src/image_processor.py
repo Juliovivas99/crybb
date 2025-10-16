@@ -4,7 +4,7 @@ Now placeholder-only: overlay and facial landmark logic removed.
 """
 from PIL import Image, ImageEnhance
 import io
-from config import Config
+from src.config import Config
 
 
 class ImageProcessor:

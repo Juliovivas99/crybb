@@ -4,7 +4,7 @@ Simple storage for persisting since_id and processed tweet IDs across runs.
 import json
 import os
 from typing import Optional, Set
-from config import Config
+from src.config import Config
 
 
 class Storage:
@@ -29,11 +29,14 @@ class Storage:
         return None
     
     def write_since_id(self, since_id: str) -> None:
-        """Write since_id to storage file."""
+        """Atomically write since_id to storage file."""
         try:
+            os.makedirs(os.path.dirname(self.storage_file), exist_ok=True)
             data = {"since_id": since_id}
-            with open(self.storage_file, "w") as f:
+            tmp = f"{self.storage_file}.tmp"
+            with open(tmp, "w") as f:
                 json.dump(data, f, indent=2)
+            os.replace(tmp, self.storage_file)  # atomic on POSIX
         except Exception as e:
             print(f"Error writing since_id: {e}")
     
@@ -50,21 +53,19 @@ class Storage:
         return set()
     
     def mark_processed(self, tweet_id: str) -> None:
-        """Mark a tweet ID as processed (atomic write)."""
+        """Atomically mark a tweet as processed."""
         try:
-            # Read existing processed IDs
-            processed_ids = self.read_processed_ids()
-            
-            # Add new ID
-            processed_ids.add(tweet_id)
-            
-            # Write back atomically
-            data = {"processed_ids": list(processed_ids)}
-            with open(self.processed_ids_file, "w") as f:
-                json.dump(data, f, indent=2)
-                
+            os.makedirs(os.path.dirname(self.processed_ids_file), exist_ok=True)
+            current = self.read_processed_ids()
+            if tweet_id in current:
+                return
+            current.add(tweet_id)
+            tmp = f"{self.processed_ids_file}.tmp"
+            with open(tmp, "w") as f:
+                json.dump({"processed_ids": sorted(list(current))}, f, indent=2)
+            os.replace(tmp, self.processed_ids_file)  # atomic on POSIX
         except Exception as e:
-            print(f"Error marking tweet {tweet_id} as processed: {e}")
+            print(f"Error marking {tweet_id} processed: {e}")
     
     def is_processed(self, tweet_id: str) -> bool:
         """Check if a tweet ID has been processed."""

@@ -5,20 +5,21 @@ Handles mention polling, processing, and replying with intelligent rate limiting
 import time
 import threading
 from typing import Optional
-from config import Config
-from twitter_factory import make_twitter_client
-from image_processor import ImageProcessor
-from rate_limiter import RateLimiter
-from per_user_limiter import PerUserLimiter, normalize
-from storage import Storage
-from utils import (
+from src.config import Config
+from src.twitter_factory import make_twitter_client
+from src.image_processor import ImageProcessor
+from src.rate_limiter import RateLimiter
+from src.per_user_limiter import PerUserLimiter, normalize
+from src.storage import Storage
+from src.utils import (
     extract_target_after_bot,
     normalize_pfp_url,
     format_friendly_message,
     format_rate_limit_message,
     format_error_message
 )
-from pipeline.orchestrator import Orchestrator
+from src.pipeline.orchestrator import Orchestrator
+from src.batch_context import ProcessingContext
 
 class CryBBBot:
     """Main bot class."""
@@ -30,7 +31,7 @@ class CryBBBot:
         self.orchestrator = Orchestrator(Config)
         self.rate_limiter = RateLimiter()
         self.storage = Storage()
-        self.user_limiter = PerUserLimiter(Config.PER_USER_HOURLY_LIMIT, 3600)
+        self.user_limiter = PerUserLimiter(Config.PER_TARGET_HOURLY_LIMIT, 3600)
         self.sleeper_mode = False
         self.last_retweeted_id = None
         
@@ -38,7 +39,51 @@ class CryBBBot:
         self.bot_id, self.bot_handle = self.twitter_client.get_bot_identity()
         print(f"Bot initialized: @{self.bot_handle} (ID: {self.bot_id})")
     
-    def process_mention(self, tweet_data: dict) -> None:
+    def resolve_target_user(self, target_username: str, ctx: ProcessingContext) -> dict | None:
+        """Resolve target user with batch-first resolution strategy."""
+        username_lc = (target_username or "").lower()
+
+        # 1) Batch snapshot (preferred)
+        u = ctx.get_user(username_lc)
+        if u:
+            return u
+
+        # 2) Global cache fallback
+        try:
+            cached_user = self.twitter_client.get_user_by_username(target_username)
+            if cached_user:
+                user_data = {
+                    "id": cached_user.id,
+                    "username": cached_user.username,
+                    "name": cached_user.name,
+                    "profile_image_url": cached_user.profile_image_url,
+                    "verified": cached_user.verified
+                }
+                # Pin for long jobs
+                ctx.pin_user(username_lc, user_data)
+                return user_data
+        except Exception as e:
+            print(f"Cache lookup failed for @{target_username}: {e}")
+
+        # 3) Network fallback (rare): only if truly missing
+        try:
+            user = self.twitter_client.get_user_by_username(target_username)
+            if user:
+                user_data = {
+                    "id": user.id,
+                    "username": user.username,
+                    "name": user.name,
+                    "profile_image_url": user.profile_image_url,
+                    "verified": user.verified
+                }
+                ctx.pin_user(username_lc, user_data)
+                return user_data
+        except Exception as e:
+            print(f"Network lookup failed for @{target_username}: {e}")
+
+        return None
+    
+    def process_mention(self, tweet_data: dict, ctx: ProcessingContext) -> None:
         """
         Process a single mention using the new v2 client interface.
         Optimized to minimize API calls through intelligent caching.
@@ -51,60 +96,63 @@ class CryBBBot:
             
             print(f"Processing mention from {author_id}: {tweet_text}")
             
+            # Get author username from batch snapshot for rate limiting
+            author_username = None
+            if 'author' in tweet_data:
+                # Use expanded author data from mentions response (no extra API call needed!)
+                author_data = tweet_data['author']
+                author_username = author_data.get('username')
+            
             # Check rate limit
-            if not self.rate_limiter.allow(author_id):
-                print(f"Rate limit exceeded for user {author_id}")
+            if not self.rate_limiter.allow(author_id, author_username):
+                print(f"Rate limit exceeded for user {author_username or author_id}")
                 self.twitter_client.reply_with_image(
                     tweet_id,
                     format_rate_limit_message(),
                     self._create_error_image()
                 )
                 return
+            else:
+                if author_username:
+                    print(f"Incoming limiter OK for @{author_username}")
             
-            # Get author info - use cached data if available from mentions expansion
-            author_username = None
+            # Get full author info - use cached data if available from mentions expansion
+            author_verified = False
             if 'author' in tweet_data:
                 # Use expanded author data from mentions response (no extra API call needed!)
                 author_data = tweet_data['author']
-                author_username = author_data.get('username')
-                print(f"Using cached author data: @{author_username}")
+                author_verified = author_data.get('verified', False)
+                print(f"Using cached author data: @{author_username} (verified: {author_verified})")
+                
+                # Check if author is verified - only verified users can call the bot
+                if not author_verified:
+                    print(f"Skipping mention from non-verified user @{author_username}")
+                    return  # Skip processing silently for non-verified users
             else:
                 # Fallback: get author info via API call (should rarely happen with proper expansions)
                 author = self.twitter_client.get_user_by_id(author_id)
                 author_username = author.username if author else None
-                print(f"Fetched author data via API: @{author_username}")
+                author_verified = author.verified if author else False
+                print(f"Fetched author data via API: @{author_username} (verified: {author_verified})")
+                
+                # Check if author is verified - only verified users can call the bot
+                if not author_verified:
+                    print(f"Skipping mention from non-verified user @{author_username}")
+                    return  # Skip processing silently for non-verified users
             
             # Extract target using new robust method
             target_username = extract_target_after_bot(tweet_data, Config.BOT_HANDLE, author_username or "")
             
             print(f"Target chosen: @{target_username}")
-            # Per-user limiter with whitelist bypass
-            if normalize(target_username) in Config.WHITELIST_HANDLES:
-                print(f"Whitelist bypass for @{target_username} (no per-user cap).")
+            # Per-target limiter (no whitelist bypass - all users treated equally)
+            if not self.user_limiter.allow(target_username):
+                print(f"Per-target limit reached for @{target_username}; skipping.")
+                return
             else:
-                if not self.user_limiter.allow(target_username):
-                    print(f"Per-user limit reached for @{target_username}; skipping.")
-                    return
-                else:
-                    print(f"Per-user count @{target_username} = {self.user_limiter.count(target_username)} in last hour")
+                print(f"Per-target count @{target_username} = {self.user_limiter.count(target_username)} in last hour")
             
-            # Get target user and profile image - try expanded data first
-            target_user_data = None
-            if 'mentioned_users' in tweet_data and target_username in tweet_data['mentioned_users']:
-                # Use expanded user data (no API call needed!)
-                target_user_data = tweet_data['mentioned_users'][target_username]
-                print(f"Using cached target user data: @{target_username}")
-            else:
-                # Fallback: get target user via API call
-                target_user = self.twitter_client.get_user_by_username(target_username)
-                if target_user:
-                    target_user_data = {
-                        'id': target_user.id,
-                        'username': target_user.username,
-                        'name': target_user.name,
-                        'profile_image_url': target_user.profile_image_url
-                    }
-                    print(f"Fetched target user data via API: @{target_username}")
+            # Get target user and profile image using batch-first resolution
+            target_user_data = self.resolve_target_user(target_username, ctx)
             
             if not target_user_data:
                 print(f"Could not fetch user @{target_username}")
@@ -127,6 +175,10 @@ class CryBBBot:
                 )
                 return
             
+            # Pin user data for long-running AI processing
+            if target_user_data:
+                ctx.pin_user(target_user_data["username"].lower(), target_user_data)
+            
             # Generate image with [style, target_pfp] order
             image_bytes = self.orchestrator.render_with_urls(
                 [Config.CRYBB_STYLE_URL, pfp_url],
@@ -138,7 +190,7 @@ class CryBBBot:
             self.twitter_client.reply_with_image(tweet_id, reply_text, image_bytes)
             
             # Update metrics
-            from server import update_metrics
+            from src.server import update_metrics
             update_metrics(processed=1, replies_sent=1, last_mention_time=tweet_data.get('created_at'))
             
         except Exception as e:
@@ -150,12 +202,12 @@ class CryBBBot:
                     self._create_error_image()
                 )
                 # Update error metrics
-                from server import update_metrics
+                from src.server import update_metrics
                 update_metrics(processed=1, ai_fail=1)
             except:
                 print("Failed to send error reply")
                 # Update error metrics
-                from server import update_metrics
+                from src.server import update_metrics
                 update_metrics(processed=1, ai_fail=1)
     
     def _create_error_image(self) -> bytes:
@@ -197,44 +249,98 @@ class CryBBBot:
                 print(f"Rate limit status: {rate_status}")
                 
                 # Fetch mentions
-                mentions = self.twitter_client.get_mentions(since_id)
+                mentions_response = self.twitter_client.get_mentions(since_id)
 
                 # If rate-limited marker, skip processing and sleeping handled by client
-                if isinstance(mentions, dict) and mentions.get("rate_limited"):
+                if isinstance(mentions_response, dict) and mentions_response.get("rate_limited"):
                     # Do not change mode, just continue loop
                     continue
+                
+                # Extract mentions and includes from response
+                mentions = mentions_response.get("tweets", []) if isinstance(mentions_response, dict) else mentions_response
+                includes = mentions_response.get("includes", {}) if isinstance(mentions_response, dict) else {}
+                users = includes.get("users", []) or []
                 
                 if mentions:
                     print(f"Found {len(mentions)} mentions")
                     
-                    # Get processed IDs to avoid duplicates
-                    processed_ids = self.storage.read_processed_ids()
+                    # Build batch snapshot from includes.users
+                    from src.x_v2 import _normalize_user_min
+                    batch_users = {
+                        (u.get("username", "").lower()): _normalize_user_min(u)
+                        for u in users if u.get("username")
+                    }
                     
-                    # Process mentions (oldest first) - skip already processed
-                    processed_count = 0
-                    for mention in mentions:
-                        tweet_id = mention['id']
-                        
-                        # Skip if already processed
-                        if self.storage.is_processed(tweet_id):
-                            print(f"⏩ Skipping already processed tweet {tweet_id}")
+                    ctx = ProcessingContext(batch_users=batch_users)
+                    print(f"Built batch snapshot: users={len(batch_users)}")
+                    
+                    # Process mentions with contiguous success tracking
+                    processed_ids = self.storage.read_processed_ids()
+                    oldest_first = mentions  # assumed oldest→newest
+                    success_ids: set[str] = set()
+                    failed_ids: list[str] = []
+                    
+                    def last_contiguous_success(seq):
+                        """
+                        Return the last tweet_id of the contiguous success prefix from the oldest.
+                        A 'success' means the tweet_id is in success_ids (including already processed).
+                        """
+                        last = None
+                        for m in seq:
+                            tid = m["id"]
+                            if tid in success_ids:
+                                last = tid
+                            else:
+                                break
+                        return last
+                    
+                    # Count already-processed as success so they contribute to the prefix.
+                    for m in oldest_first:
+                        tid = m["id"]
+                        if self.storage.is_processed(tid):
+                            success_ids.add(tid)
+                    
+                    for m in oldest_first:
+                        tid = m["id"]
+                        if tid in success_ids:
+                            # Already processed earlier (or in previous runs)
                             continue
                         
-                        # Process the mention
-                        self.process_mention(mention)
-                        
-                        # Mark as processed after successful processing
-                        self.storage.mark_processed(tweet_id)
-                        print(f"✅ Processed tweet {tweet_id}")
-                        
-                        # Update since_id after successful processing
-                        since_id = tweet_id
-                        processed_count += 1
+                        try:
+                            # ---- your existing routing (AI vs overlay vs text rules) is inside process_mention() ----
+                            self.process_mention(m, ctx)
+                            self.storage.mark_processed(tid)
+                            success_ids.add(tid)
+                            print(f"✅ Processed {tid}")
+                        except Exception as e:
+                            print(f"❌ Failed {tid}: {e}")
+                            # Try a text-only fallback reply ONCE.
+                            try:
+                                self.twitter_client.create_reply_text(
+                                    in_reply_to=tid,
+                                    text="Sorry — I couldn't render that one. Try again in a bit! 💛"
+                                )
+                                self.storage.mark_processed(tid)
+                                success_ids.add(tid)
+                                print(f"📝 Sent fallback text for {tid}")
+                            except Exception as e2:
+                                print(f"⚠️ Fallback also failed for {tid}: {e2}")
+                                failed_ids.append(tid)
+                                # leave unmarked so it retries next poll
                     
-                    # Save since_id only if we processed any mentions
-                    if processed_count > 0:
-                        self.storage.write_since_id(since_id)
-                        print(f"📝 Updated since_id to {since_id} after processing {processed_count} mentions")
+                    # Advance since_id only to last *contiguous* success from the oldest.
+                    prefix_last = last_contiguous_success(oldest_first)
+                    if prefix_last:
+                        prev = self.storage.read_since_id()
+                        if prefix_last != prev:
+                            self.storage.write_since_id(prefix_last)
+                            print(f"📝 since_id → {prefix_last}")
+                    
+                    if failed_ids:
+                        print(f"⏳ Will retry next poll: {failed_ids}")
+                    
+                    # Debug log
+                    print(f"📦 Batch done: successes={len(success_ids)} failures={len(failed_ids)} since_id={self.storage.read_since_id()}")
                     
                     # Reset backoff and error counters on successful processing
                     backoff_seconds = 1
@@ -321,7 +427,7 @@ class CryBBBot:
         # Start health server in background thread
         def run_health_server():
             import uvicorn
-            from server import app
+            from src.server import app
             uvicorn.run(app, host="0.0.0.0", port=Config.PORT, log_level="warning")
         
         health_thread = threading.Thread(target=run_health_server, daemon=True)

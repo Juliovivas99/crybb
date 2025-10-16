@@ -191,7 +191,7 @@ def step_rate_limiter() -> Dict[str, Any]:
         from src.rate_limiter import RateLimiter
         rl = RateLimiter()
         author = "tester"
-        results = [rl.allow(author) for _ in range(6)]
+        results = [rl.allow(author, None) for _ in range(6)]
         if results[:5] == [True, True, True, True, True] and results[5] is False:
             return ok(name, "Denied on 6th request as expected")
         return fail(name, f"Unexpected allow sequence: {results}")

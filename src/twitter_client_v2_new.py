@@ -5,10 +5,9 @@ Reads use Bearer token; writes (tweets/media/retweet) use OAuth1a.
 import time
 from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import dataclass
-from config import Config
+from src.config import Config
 import requests
-from x_v2 import XAPIv2Client, bearer_headers
-from ratelimit import RateLimiter
+from src.x_v2 import XAPIv2Client, bearer_headers
 
 
 @dataclass
@@ -18,6 +17,7 @@ class UserInfo:
     username: str
     name: str
     profile_image_url: Optional[str] = None
+    verified: Optional[bool] = None
 
 
 class TwitterClientV2New:
@@ -30,9 +30,6 @@ class TwitterClientV2New:
         """Initialize the v2 client with Bearer + OAuth1a auth model."""
         # Create v2 API client (uses global helpers)
         self.client = XAPIv2Client()
-        
-        # Centralized rate limiter
-        self.rate_limiter = RateLimiter()
         
         print("Twitter API v2 client initialized (Bearer reads, OAuth1a writes)")
     
@@ -71,7 +68,7 @@ class TwitterClientV2New:
         
         try:
             url = f"https://api.twitter.com/2/users/{user_id}"
-            params = {'user.fields': 'id,username,name,profile_image_url'}
+            params = {'user.fields': 'id,username,name,profile_image_url,verified'}
             response = requests.get(url, headers=bearer_headers(), params=params, timeout=Config.HTTP_TIMEOUT_SECS)
             response.raise_for_status()
             data = response.json()
@@ -82,7 +79,8 @@ class TwitterClientV2New:
                     id=user_data['id'],
                     username=user_data['username'],
                     name=user_data['name'],
-                    profile_image_url=user_data.get('profile_image_url')
+                    profile_image_url=user_data.get('profile_image_url'),
+                    verified=user_data.get('verified', False)
                 )
                 
                 # Cache the result
@@ -135,6 +133,12 @@ class TwitterClientV2New:
         This is the main method used by the bot for replying.
         """
         self.client.reply_with_image(in_reply_to_tweet_id, text, image_bytes)
+    
+    def create_reply_text(self, in_reply_to: str, text: str) -> dict:
+        """
+        Create a text-only reply to tweet_id using OAuth1a (v2 /tweets).
+        """
+        return self.client.create_reply(text, in_reply_to, media_ids=None)
     
     def get_rate_limit_status(self) -> Dict[str, Dict[str, Any]]:
         """Get current rate limit status for monitoring."""

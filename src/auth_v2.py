@@ -8,7 +8,7 @@ import time
 import requests
 from typing import Optional, Dict, Any
 from dataclasses import dataclass
-from config import Config
+from src.config import Config
 
 
 @dataclass

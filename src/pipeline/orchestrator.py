@@ -1,7 +1,7 @@
 from typing import List
-from image_processor import ImageProcessor
-from ai.nano_banana_client import run_nano_banana, BAD_STYLE_URL, BAD_PFP_URL
-from ai.prompt_crybb import build_prompt
+from src.image_processor import ImageProcessor
+from src.ai.nano_banana_client import run_nano_banana, BAD_STYLE_URL, BAD_PFP_URL
+from src.ai.prompt_crybb import build_prompt
 
 
 def render_placeholder_bytes(pfp_url: str, cfg) -> bytes:

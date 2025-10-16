@@ -30,7 +30,7 @@ class Config:
     FIXTURES_DIR: str = os.getenv("FIXTURES_DIR", "fixtures")
     
     # Rate limiting
-    RATE_LIMIT_PER_HOUR: int = 5
+    RATE_LIMIT_PER_HOUR: int = 12
     
     # Image processing
     JPEG_QUALITY: int = 90
@@ -54,6 +54,7 @@ class Config:
     # Adaptive polling and per-user limits
     WHITELIST_HANDLES = set(os.getenv("WHITELIST_HANDLES", "thenighguy,crybaby_on_sol").lower().replace("@","" ).split(","))
     PER_USER_HOURLY_LIMIT: int = int(os.getenv("PER_USER_HOURLY_LIMIT", "12"))
+    PER_TARGET_HOURLY_LIMIT: int = int(os.getenv("PER_TARGET_HOURLY_LIMIT", "5"))
     AWAKE_MIN_SECS: int = int(os.getenv("AWAKE_MIN_SECS", "180"))
     AWAKE_MAX_SECS: int = int(os.getenv("AWAKE_MAX_SECS", "300"))
     SLEEPER_MIN_SECS: int = int(os.getenv("SLEEPER_MIN_SECS", "600"))

@@ -7,7 +7,7 @@ import requests
 from typing import Optional, Dict, List, Any, Tuple
 from dataclasses import dataclass
 from requests_oauthlib import OAuth1
-from config import Config
+from src.config import Config
 
 
 @dataclass
@@ -17,6 +17,7 @@ class UserInfo:
     username: str
     name: str
     profile_image_url: Optional[str] = None
+    verified: Optional[bool] = None
 
 
 @dataclass
@@ -41,6 +42,17 @@ def oauth1_auth() -> OAuth1:
         Config.ACCESS_TOKEN,
         Config.ACCESS_SECRET,
     )
+
+
+def _normalize_user_min(u: dict) -> dict:
+    """Normalize user data to minimal fields needed downstream."""
+    from src.utils import normalize_pfp_url
+    return {
+        "id": u.get("id"),
+        "username": u.get("username"),
+        "name": u.get("name"),
+        "profile_image_url": normalize_pfp_url(u.get("profile_image_url", "")),
+    }
 
 
 class XAPIv2Client:
@@ -160,7 +172,7 @@ class XAPIv2Client:
         try:
             url = f"{self.base_url}/users/by/username/{username}"
             params = {
-                'user.fields': 'id,username,name,profile_image_url'
+                'user.fields': 'id,username,name,profile_image_url,verified'
             }
             
             response = requests.get(url, headers=bearer_headers(), params=params, timeout=30)
@@ -176,7 +188,8 @@ class XAPIv2Client:
                     id=user_data['id'],
                     username=user_data['username'],
                     name=user_data['name'],
-                    profile_image_url=user_data.get('profile_image_url')
+                    profile_image_url=user_data.get('profile_image_url'),
+                    verified=user_data.get('verified', False)
                 )
                 
                 # Cache the result
@@ -196,7 +209,7 @@ class XAPIv2Client:
             params = {
                 'max_results': max_results,
                 'expansions': 'author_id,entities.mentions.username',
-                'user.fields': 'id,username,name,profile_image_url',
+                'user.fields': 'id,username,name,profile_image_url,verified',
                 'tweet.fields': 'created_at,entities,author_id'
             }
             
@@ -231,7 +244,8 @@ class XAPIv2Client:
                             'id': user['id'],
                             'username': user['username'],
                             'name': user['name'],
-                            'profile_image_url': user.get('profile_image_url')
+                            'profile_image_url': user.get('profile_image_url'),
+                            'verified': user.get('verified', False)
                         }
                 
                 # Process mentions and attach user data
@@ -269,11 +283,21 @@ class XAPIv2Client:
             print(f"Retrieved {len(mentions)} mentions with expanded user data")
             self._maybe_sleep('users/mentions')
             
-            return mentions
+            # Return mentions with includes.users for batch processing
+            result = {
+                "tweets": mentions,
+                "includes": {
+                    "users": data.get('includes', {}).get('users', [])
+                }
+            }
+            return result
             
         except Exception as e:
             print(f"Error getting mentions: {e}")
-            return []
+            return {
+                "tweets": [],
+                "includes": {"users": []}
+            }
     
     def media_upload(self, image_bytes: bytes, mime: str = "image/jpeg") -> str:
         """

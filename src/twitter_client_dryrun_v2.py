@@ -7,7 +7,7 @@ import os
 import time
 from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import dataclass
-from config import Config
+from src.config import Config
 
 
 @dataclass
@@ -17,6 +17,7 @@ class UserInfo:
     username: str
     name: str
     profile_image_url: Optional[str] = None
+    verified: Optional[bool] = None
 
 
 class TwitterClientDryRunV2:
@@ -52,7 +53,8 @@ class TwitterClientDryRunV2:
             id=user_id,
             username="dryrunuser",
             name="Dry Run User",
-            profile_image_url="https://pbs.twimg.com/profile_images/1701423369848893440/kp3HKM8o_400x400.jpg"
+            profile_image_url="https://pbs.twimg.com/profile_images/1701423369848893440/kp3HKM8o_400x400.jpg",
+            verified=True
         )
         
         self._user_cache[user_id] = user_info
@@ -69,7 +71,8 @@ class TwitterClientDryRunV2:
             id="987654321",
             username=username,
             name=f"Dry Run {username}",
-            profile_image_url="https://pbs.twimg.com/profile_images/1701423369848893440/kp3HKM8o_400x400.jpg"
+            profile_image_url="https://pbs.twimg.com/profile_images/1701423369848893440/kp3HKM8o_400x400.jpg",
+            verified=True
         )
         
         self._user_cache[user_info.id] = user_info

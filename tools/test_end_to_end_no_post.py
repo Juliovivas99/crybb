@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-End-to-end test script for CryBB bot OAuth2-only approach.
-Tests media upload (OAuth1a) and tweet creation (OAuth2) without actually posting.
+End-to-end test script for CryBB bot.
+Tests media upload (OAuth1a) and tweet creation (OAuth1a) without actually posting.
 """
 import os
 import sys
@@ -12,7 +12,7 @@ from PIL import Image
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 from config import Config
-from x_v2 import XAPIv2Client, _oauth2_headers, _oauth1_media_auth, _oauth2_refresh
+from x_v2 import XAPIv2Client, bearer_headers, oauth1_auth
 
 
 def create_minimal_jpeg():
@@ -41,32 +41,31 @@ def test_media_upload():
         return None
 
 
-def test_oauth2_headers():
-    """Test OAuth2 User Context headers."""
-    print("🧪 Testing OAuth2 User Context headers...")
+def test_oauth1_headers():
+    """Test OAuth1a headers."""
+    print("🧪 Testing OAuth1a headers...")
     
     try:
-        headers = _oauth2_headers()
-        print(f"✅ OAuth2 headers OK - Authorization: {headers['Authorization'][:20]}...")
+        auth = oauth1_auth()
+        print(f"✅ OAuth1a auth OK")
         return True
         
     except Exception as e:
-        print(f"❌ OAuth2 headers failed: {e}")
+        print(f"❌ OAuth1a auth failed: {e}")
         return False
 
 
-def test_oauth2_refresh():
-    """Test OAuth2 token refresh."""
-    print("🧪 Testing OAuth2 token refresh...")
+def test_bearer_headers():
+    """Test Bearer token headers."""
+    print("🧪 Testing Bearer token headers...")
     
     try:
-        # This will only work if tokens are actually expired
-        # For testing, we'll just verify the function exists and can be called
-        print("✅ OAuth2 refresh function available")
+        headers = bearer_headers()
+        print(f"✅ Bearer headers OK - Authorization: {headers['Authorization'][:20]}...")
         return True
         
     except Exception as e:
-        print(f"❌ OAuth2 refresh test failed: {e}")
+        print(f"❌ Bearer headers failed: {e}")
         return False
 
 
@@ -94,21 +93,23 @@ def test_tweet_creation_dry_run():
 
 def main():
     """Run all tests."""
-    print("🚀 CryBB Bot OAuth2-Only End-to-End Test")
+    print("🚀 CryBB Bot End-to-End Test")
     print("=" * 50)
     
     # Check configuration
-    print(f"[CONFIG] OAUTH_WRITE_MODE={Config.OAUTH_WRITE_MODE}")
-    print(f"[CONFIG] CLIENT_ID={'*' * 10 if Config.CLIENT_ID else 'MISSING'}")
-    print(f"[CONFIG] OAUTH2_USER_ACCESS_TOKEN={'*' * 20 if Config.OAUTH2_USER_ACCESS_TOKEN else 'MISSING'}")
-    print(f"[CONFIG] API_KEY={'*' * 10 if Config.API_KEY else 'MISSING'} (for media upload)")
+    print(f"[CONFIG] TWITTER_MODE={Config.TWITTER_MODE}")
+    print(f"[CONFIG] API_KEY={'*' * 10 if Config.API_KEY else 'MISSING'}")
+    print(f"[CONFIG] API_SECRET={'*' * 10 if Config.API_SECRET else 'MISSING'}")
+    print(f"[CONFIG] ACCESS_TOKEN={'*' * 10 if Config.ACCESS_TOKEN else 'MISSING'}")
+    print(f"[CONFIG] ACCESS_SECRET={'*' * 10 if Config.ACCESS_SECRET else 'MISSING'}")
+    print(f"[CONFIG] BEARER_TOKEN={'*' * 10 if Config.BEARER_TOKEN else 'MISSING'}")
     print()
     
     # Run tests
     tests = [
         ("Media Upload (OAuth1a)", test_media_upload),
-        ("OAuth2 Headers", test_oauth2_headers),
-        ("OAuth2 Refresh", test_oauth2_refresh),
+        ("OAuth1a Headers", test_oauth1_headers),
+        ("Bearer Headers", test_bearer_headers),
         ("Tweet Creation (Dry Run)", test_tweet_creation_dry_run),
     ]
     
@@ -135,7 +136,7 @@ def main():
     print(f"\n🎯 Overall: {passed}/{len(results)} tests passed")
     
     if passed == len(results):
-        print("🎉 All tests passed! OAuth2-only setup is working correctly.")
+        print("🎉 All tests passed! Bot setup is working correctly.")
     else:
         print("⚠️  Some tests failed. Check configuration and tokens.")
     

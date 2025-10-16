@@ -5,7 +5,7 @@ Implements in-memory per-user rate limiting.
 from collections import deque
 from typing import Dict
 import time
-from config import Config
+from src.config import Config
 
 class RateLimiter:
     """In-memory rate limiter using sliding window."""
@@ -17,15 +17,28 @@ class RateLimiter:
         self.window_size = 3600  # 1 hour in seconds
         self.max_requests = Config.RATE_LIMIT_PER_HOUR
     
-    def allow(self, author_id: str) -> bool:
+    def allow(self, author_id: str, author_username: str | None = None) -> bool:
         """Check if user is allowed to make a request."""
+        # Determine key as normalized username when available; else fall back to ID
+        key = None
+        if author_username:
+            from src.per_user_limiter import normalize  # reuse existing helper
+            user_key = normalize(author_username)
+            # Whitelist bypass by username
+            if user_key in Config.WHITELIST_HANDLES:
+                print(f"Whitelist bypass for @{author_username} (incoming mentions)")
+                return True
+            key = user_key
+        else:
+            key = str(author_id)
+        
         current_time = time.time()
         
         # Get or create user's request history
-        if author_id not in self.user_requests:
-            self.user_requests[author_id] = deque()
+        if key not in self.user_requests:
+            self.user_requests[key] = deque()
         
-        user_deque = self.user_requests[author_id]
+        user_deque = self.user_requests[key]
         
         # Remove old requests outside the window
         while user_deque and user_deque[0] <= current_time - self.window_size:

@@ -1,9 +1,6 @@
 BASE_PROMPT = (
-  "change the clothes of the first character to the clothes of the character in the second image, if needed change his hair color, skin color, eyes color and tattoos in case they are different from the original image. keep the style consistent to the one in the first image. VERY IMPORTANT, always keep the tears"
+    "apply the clothes and character traits from the second image to the character in the first one, including animal features (fur color, animal type, animal traits, skin color), if needed make the second pfp similar in the style of the first one if there are too many traits to transpose. change the pose if needed to reflect the character position in the second imageALWAYS KEEP THE TEARS"
 )
-
 
 def build_prompt() -> str:
     return BASE_PROMPT + " Keep the identity cues and overall composition from the second image."
-
-

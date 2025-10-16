@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from datetime import datetime
 import os
 import time
-from config import Config
+from src.config import Config
 
 app = FastAPI(title="CryBB Maker Bot", version="2.0.0")
 

@@ -1,0 +1,90 @@
+{
+  "timestamp": "2025-10-13T17:25:54.657987",
+  "config": {
+    "style_url": "https://crybb-host.vercel.app/newCrybb.jpg",
+    "pipeline": "ai",
+    "model": "google/nano-banana"
+  },
+  "results": [
+    {
+      "pfp_url": "https://pbs.twimg.com/profile_images/1975699930543951872/ektsy7PJ_400x400.jpg",
+      "generated_image_path": "simulation_output/crybb_output_1.jpg",
+      "image_size_bytes": 54773,
+      "generation_time_seconds": 10.505604982376099,
+      "reply_text": "Here's your CryBB PFP @testuser1 \ud83c\udf7c",
+      "twitter_payload": {
+        "text": "Here's your CryBB PFP @testuser1 \ud83c\udf7c",
+        "reply": {
+          "in_reply_to_tweet_id": "mock_tweet_1760390719_1"
+        },
+        "media": {
+          "media_ids": [
+            "mock_media_1_1760390719"
+          ]
+        }
+      },
+      "mock_tweet_id": "mock_tweet_1760390719_1",
+      "mock_media_id": "mock_media_1_1760390719"
+    },
+    {
+      "pfp_url": "https://pbs.twimg.com/profile_images/1673462694832140290/r1OCau5P_400x400.jpg",
+      "generated_image_path": "simulation_output/crybb_output_2.jpg",
+      "image_size_bytes": 68126,
+      "generation_time_seconds": 12.685418128967285,
+      "reply_text": "Here's your CryBB PFP @testuser2 \ud83c\udf7c",
+      "twitter_payload": {
+        "text": "Here's your CryBB PFP @testuser2 \ud83c\udf7c",
+        "reply": {
+          "in_reply_to_tweet_id": "mock_tweet_1760390732_2"
+        },
+        "media": {
+          "media_ids": [
+            "mock_media_2_1760390732"
+          ]
+        }
+      },
+      "mock_tweet_id": "mock_tweet_1760390732_2",
+      "mock_media_id": "mock_media_2_1760390732"
+    },
+    {
+      "pfp_url": "https://pbs.twimg.com/profile_images/1937179802290561024/5cjt-zs0_400x400.jpg",
+      "generated_image_path": "simulation_output/crybb_output_3.jpg",
+      "image_size_bytes": 62907,
+      "generation_time_seconds": 12.211735010147095,
+      "reply_text": "Here's your CryBB PFP @testuser3 \ud83c\udf7c",
+      "twitter_payload": {
+        "text": "Here's your CryBB PFP @testuser3 \ud83c\udf7c",
+        "reply": {
+          "in_reply_to_tweet_id": "mock_tweet_1760390744_3"
+        },
+        "media": {
+          "media_ids": [
+            "mock_media_3_1760390744"
+          ]
+        }
+      },
+      "mock_tweet_id": "mock_tweet_1760390744_3",
+      "mock_media_id": "mock_media_3_1760390744"
+    },
+    {
+      "pfp_url": "https://pbs.twimg.com/profile_images/1926595777322688513/ph0tlmgJ_400x400.jpg",
+      "generated_image_path": "simulation_output/crybb_output_4.jpg",
+      "image_size_bytes": 66123,
+      "generation_time_seconds": 10.021482944488525,
+      "reply_text": "Here's your CryBB PFP @testuser4 \ud83c\udf7c",
+      "twitter_payload": {
+        "text": "Here's your CryBB PFP @testuser4 \ud83c\udf7c",
+        "reply": {
+          "in_reply_to_tweet_id": "mock_tweet_1760390754_4"
+        },
+        "media": {
+          "media_ids": [
+            "mock_media_4_1760390754"
+          ]
+        }
+      },
+      "mock_tweet_id": "mock_tweet_1760390754_4",
+      "mock_media_id": "mock_media_4_1760390754"
+    }
+  ]
+}

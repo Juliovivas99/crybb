@@ -42,7 +42,7 @@ def test_bearer_token():
     try:
         url = f"https://api.twitter.com/2/users/by/username/{Config.BOT_HANDLE}"
         params = {
-            'user.fields': 'id,username,name'
+            'user.fields': 'id,username,name,verified'
         }
         response = requests.get(url, headers=bearer_headers(), params=params, timeout=30)
         

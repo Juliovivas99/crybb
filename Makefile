@@ -27,3 +27,9 @@ diagnose:
 
 test-api:
 	python3 tools/test_basic_plan.py
+
+stress-test:
+	python3 tools/run_stress_test.py
+
+stress-test-custom:
+	python3 tools/stress_test_verification.py
