@@ -70,7 +70,7 @@ def simulate_pfp_processing():
             mock_username = f"testuser{i}"
             
             # Create reply payload
-            reply_text = f"Here's your CryBB PFP @{mock_username} 🍼"
+            reply_text = f"Welcome to $CRYBB @{mock_username} 🍼\n\nNO CRYING IN THE CASINO."
             
             # Simulate what would be uploaded to Twitter
             mock_media_id = f"mock_media_{i}_{int(time.time())}"

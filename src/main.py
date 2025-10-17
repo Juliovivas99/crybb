@@ -166,11 +166,16 @@ class CryBBBot:
             # Prevent loops: replies to bot must include a valid @bot @target pair
             is_reply_to_bot = (str(in_reply_to_user_id) == str(self.bot_id))
             if is_reply_to_bot and not target_username:
-                print("[SKIP] Reply to bot without explicit @bot @target pair")
+                print(f"[SKIP] Reply to bot without explicit @bot @target pair ({reason})")
+                return
+
+            # Additional check: if it's a reply to bot and we have a target, ensure + rule is followed
+            if is_reply_to_bot and target_username and reason == "require-plus-gap-missing":
+                print(f"[SKIP] Reply to bot with 3+ mentions but missing + symbol ({reason})")
                 return
 
             if not target_username:
-                print("[SKIP] No explicit @target after last @bot")
+                print(f"[SKIP] {reason}")
                 return
 
             from src.per_user_limiter import normalize
