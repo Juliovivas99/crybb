@@ -103,42 +103,60 @@ def extract_target_after_last_bot(
     author_id: Optional[str],
     in_reply_to_user_id: Optional[str],
 ) -> Tuple[Optional[str], str]:
-    tlc, typed = _typed_mentions(tweet)
-    if not tlc or not typed:
-        return None, "no-mentions-or-text"
+    """
+    Extract target after the last @bot mention with conversation-aware logic.
+    
+    Args:
+        tweet: Tweet data
+        bot_handle_lc: Bot handle in lowercase
+        author_id: Tweet author ID
+        in_reply_to_user_id: ID of user being replied to
+        
+    Returns:
+        Tuple of (target_username, reason) or (None, reason)
+    """
+    typed = typed_mentions(tweet)
+    if not typed:
+        return None, "no-typed-mentions"
 
-    # find the last typed @bot anywhere in the text
+    # Find the last typed @bot anywhere in the text
     bot_idxs = [i for i, m in enumerate(typed) if m["username"] == bot_handle_lc]
     if not bot_idxs:
         return None, "bot-not-in-text"
     i = bot_idxs[-1]
 
-    # need an immediate next typed mention
+    # Need an immediate next typed mention
     if i + 1 >= len(typed):
         return None, "no-next-mention"
     nxt = typed[i + 1]
-    gap = tlc[typed[i]["end"]:nxt["start"]]
+    
+    # Check gap between @bot and next mention
+    text = tweet.get("text", "")
+    gap = text[typed[i]["end"]:nxt["start"]]
 
-    # STRICT: require '+' whenever there are 3+ typed mentions (top-level or reply)
-    require_plus = (len(typed) >= 3)
-    if require_plus:
-        if not re.fullmatch(r"[ \t\r\n]*\+[ \t\r\n]*", gap or ""):
-            return None, "require-plus-gap-missing"
-    else:
-        # allow whitespace or optional single '+'
-        if not re.fullmatch(r"[ \t\r\n]*\+?[ \t\r\n]*", gap or ""):
-            return None, "gap-not-allowed"
+    # Allow whitespace or optional single '+' between @bot and target
+    if not re.fullmatch(r"[ \t\r\n]*\+?[ \t\r\n]*", gap or ""):
+        return None, "gap-not-allowed"
 
+    # Build exclusions (bot, author, reply-to user)
     excludes = _exclusions(tweet, bot_handle_lc, author_id)
+    if in_reply_to_user_id:
+        # Add reply-to user to exclusions
+        includes_users = tweet.get("includes", {}).get("users", [])
+        id_to_username = {str(u.get("id")): (u.get("username") or "").lower() 
+                         for u in includes_users if u.get("id") and u.get("username")}
+        if in_reply_to_user_id in id_to_username:
+            excludes.add(id_to_username[in_reply_to_user_id])
+
     target = nxt["username"]
     if not target:
         return None, "empty-target"
     if target in excludes:
         return None, "excluded-target"
 
-    # light dedupe info for telemetry
+    # Light dedupe info for telemetry
     dedup = (i + 2 < len(typed) and typed[i + 2]["username"] == target)
-    reason = ("immediate after last @bot (require-plus)" if require_plus else "immediate after last @bot")
+    reason = "immediate after last @bot"
     if dedup:
         reason += " (dedup)"
     return target, reason
@@ -189,3 +207,74 @@ def format_rate_limit_message() -> str:
 def format_error_message() -> str:
     """Format a friendly error message."""
     return "Oops! Something went wrong while processing your request. Please try again later! 🙏"
+
+
+def typed_mentions(tweet: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """
+    Extract typed mentions that exactly match the text at their positions.
+    Returns only entities whose text[start:end] is exactly "@{username.lower()}".
+    
+    Args:
+        tweet: Tweet data with text and entities
+        
+    Returns:
+        List of typed mention dicts with start, end, username, id
+    """
+    text = tweet.get("text", "") or ""
+    text_lower = text.lower()
+    entities = tweet.get("entities", {})
+    mentions = entities.get("mentions", [])
+    
+    typed = []
+    for mention in mentions:
+        start = mention.get("start")
+        end = mention.get("end")
+        username = mention.get("username", "").lower()
+        mention_id = mention.get("id")
+        
+        # Validate position and exact text match
+        if (isinstance(start, int) and isinstance(end, int) and 
+            0 <= start < end <= len(text)):
+            if text_lower[start:end] == f"@{username}":
+                typed.append({
+                    "start": start,
+                    "end": end,
+                    "username": username,
+                    "id": mention_id
+                })
+    
+    # Sort by position in text
+    typed.sort(key=lambda m: m["start"])
+    return typed
+
+
+def is_reply_to_bot(tweet: Dict[str, Any], bot_id: str) -> bool:
+    """
+    Check if the tweet is a reply to the bot.
+    
+    Args:
+        tweet: Tweet data
+        bot_id: Bot's user ID
+        
+    Returns:
+        True if replying to bot, False otherwise
+    """
+    in_reply_to_user_id = tweet.get("in_reply_to_user_id")
+    return str(in_reply_to_user_id) == str(bot_id)
+
+
+def get_parent_author_id(tweet: Dict[str, Any]) -> Optional[str]:
+    """
+    Get the author ID of the parent tweet from referenced_tweets.
+    
+    Args:
+        tweet: Tweet data with referenced_tweets
+        
+    Returns:
+        Parent author ID if found, None otherwise
+    """
+    referenced_tweets = tweet.get("referenced_tweets", [])
+    for ref_tweet in referenced_tweets:
+        if ref_tweet.get("type") == "replied_to":
+            return ref_tweet.get("author_id")
+    return None

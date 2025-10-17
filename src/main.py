@@ -16,6 +16,9 @@ from src.storage import Storage
 from src.utils import (
     extract_target_after_bot,
     extract_target_after_last_bot,
+    typed_mentions,
+    is_reply_to_bot,
+    get_parent_author_id,
     normalize_pfp_url,
     format_friendly_message,
     format_rate_limit_message,
@@ -107,28 +110,70 @@ class CryBBBot:
     
     def process_mention(self, tweet_data: dict, ctx: ProcessingContext) -> None:
         """
-        Process a single mention using the new v2 client interface.
-        Optimized to minimize API calls through intelligent caching.
+        Process a single mention using conversation-aware logic.
         """
         try:
-            # Extract author info from tweet data
+            # Extract basic info from tweet data
             author_id = str(tweet_data.get('author_id', ''))
             tweet_text = tweet_data.get('text', '')
             tweet_id = tweet_data.get('id', '')
+            conversation_id = tweet_data.get('conversation_id')
             in_reply_to_user_id = tweet_data.get('in_reply_to_user_id')
             
             print(f"Processing mention from {author_id}: {tweet_text}")
             
-            # Debug log for mention processing context
-            entities = tweet_data.get('entities') or {}
-            mentions = entities.get('mentions') or []
-            print(f"[MENTION DEBUG] text=\"{tweet_text}\"\nmentions={mentions}\nauthor_id={author_id} in_reply_to_user_id={in_reply_to_user_id} bot_id={self.bot_id}")
-
-            # Require explicit typed @bot anywhere in text
+            # Build typed mentions and check for @bot
             bot_handle_lc = (self.bot_handle or Config.BOT_HANDLE).lstrip("@").lower()
-            txt_lc = (tweet_text or "").lower()
-            if f"@{bot_handle_lc}" not in txt_lc:
-                print("[SKIP] No explicit @bot in text; ignoring")
+            typed = typed_mentions(tweet_data)
+            
+            # Check if @bot is in typed mentions
+            bot_in_typed = any(m["username"] == bot_handle_lc for m in typed)
+            if not bot_in_typed:
+                print("[SKIP] No @bot in typed mentions; ignoring")
+                return
+            
+            # Check if this is a reply to bot
+            reply_to_bot = is_reply_to_bot(tweet_data, self.bot_id)
+            
+            # Get parent author ID for logging
+            parent_author_id = get_parent_author_id(tweet_data)
+            
+            # Conversation-aware logic
+            if reply_to_bot:
+                # Reply to bot: require strict explicit pair
+                # @bot must be FIRST typed mention and immediately followed by @target
+                if len(typed) < 2 or typed[0]["username"] != bot_handle_lc:
+                    print("[SKIP] Reply to bot without explicit @bot @target pair")
+                    return
+                
+                # Check if @bot is immediately followed by another mention
+                if typed[1]["start"] != typed[0]["end"] + 1:  # Allow single space
+                    gap = tweet_text[typed[0]["end"]:typed[1]["start"]]
+                    if gap.strip() and gap.strip() != "+":
+                        print("[SKIP] Reply to bot without immediate @target after @bot")
+                        return
+                
+                target_username, reason = extract_target_after_last_bot(
+                    tweet_data, bot_handle_lc, author_id, in_reply_to_user_id
+                )
+            else:
+                # Not replying to bot: require @bot as FIRST typed mention
+                if typed[0]["username"] != bot_handle_lc:
+                    print("[SKIP] @bot not first typed mention in top-level tweet")
+                    return
+                
+                target_username, reason = extract_target_after_last_bot(
+                    tweet_data, bot_handle_lc, author_id, in_reply_to_user_id
+                )
+            
+            # Enhanced debug logging
+            author_username = (tweet_data.get('author') or {}).get('username') or ''
+            print(f"[MENTION DEBUG] id={tweet_id} conv={conversation_id} reply_to={in_reply_to_user_id} "
+                  f"author=@{author_username} target=@{target_username or 'None'} reason=\"{reason}\" "
+                  f"text=\"{tweet_text}\" parent_author={parent_author_id}")
+            
+            if not target_username:
+                print(f"[SKIP] {reason}")
                 return
 
             # Get author username from batch snapshot for rate limiting
@@ -158,40 +203,16 @@ class CryBBBot:
             
             print(f"[DEBUG] Processing mention from user @{author_username}")
             
-            # Choose immediate next typed mention after the LAST @bot
-            target_username, reason = extract_target_after_last_bot(
-                tweet_data, bot_handle_lc, author_id, in_reply_to_user_id
-            )
-
-            # Prevent loops: replies to bot must include a valid @bot @target pair
-            is_reply_to_bot = (str(in_reply_to_user_id) == str(self.bot_id))
-            if is_reply_to_bot and not target_username:
-                print(f"[SKIP] Reply to bot without explicit @bot @target pair ({reason})")
-                return
-
-            # Additional check: if it's a reply to bot and we have a target, ensure + rule is followed
-            if is_reply_to_bot and target_username and reason == "require-plus-gap-missing":
-                print(f"[SKIP] Reply to bot with 3+ mentions but missing + symbol ({reason})")
-                return
-
-            if not target_username:
-                print(f"[SKIP] {reason}")
-                return
-
+            # Additional validation
             from src.per_user_limiter import normalize
             if normalize(target_username) == normalize(Config.BOT_HANDLE):
                 print("[SKIP] Target is bot handle")
                 return
-            # Allow self-PFP requests - users can tweet at themselves
-            # author_username_lc = (tweet_data.get('author') or {}).get('username') or ''
-            # if author_username_lc.lower() == (target_username or "").lower():
-            #     print("[SKIP] Target is tweet author (self-PFP)")
-            #     return
-
-            if Config.DEBUG_MENTIONS:
-                au = (tweet_data.get('author') or {}).get('username') or ''
-                print(f'[MENTION DEBUG] id={tweet_id} reply_to={in_reply_to_user_id} '
-                      f'author=@{au} target=@{target_username} reason="{reason}" text="{tweet_text or ""}"')
+            
+            # Conversation de-dupe check
+            if conversation_id and self.storage.check_conversation_dedupe(conversation_id, target_username):
+                print(f"[SKIP] conv-dedupe: already processed {conversation_id} -> @{target_username} recently")
+                return
             # Per-target limiter (no whitelist bypass - all users treated equally)
             if not self.user_limiter.allow(target_username):
                 print(f"Per-target limit reached for @{target_username}; skipping.")
@@ -241,6 +262,11 @@ class CryBBBot:
             # Reply with processed image
             reply_text = f"Welcome to $CRYBB @{target_username} 🍼\n\nNO CRYING IN THE CASINO."
             reply_result = self.twitter_client.reply_with_image(tweet_id, reply_text, image_bytes)
+            
+            # Record conversation de-dupe after successful reply
+            if conversation_id:
+                self.storage.record_conversation_dedupe(conversation_id, target_username)
+            
             # Optional success log
             try:
                 if reply_result and isinstance(reply_result, dict):

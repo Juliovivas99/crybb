@@ -203,14 +203,14 @@ class XAPIv2Client:
     
     def get_mentions(self, user_id: str, since_id: Optional[str] = None, 
                     max_results: int = 100) -> List[Dict[str, Any]] | Dict[str, Any]:
-        """Get mentions with comprehensive expansions."""
+        """Get mentions with comprehensive expansions including conversation context."""
         try:
             url = f"{self.base_url}/users/{user_id}/mentions"
             params = {
                 'max_results': max_results,
-                'expansions': 'author_id,entities.mentions.username',
-                'user.fields': 'id,username,name,profile_image_url,verified',
-                'tweet.fields': 'created_at,entities,author_id'
+                'expansions': 'referenced_tweets.id,referenced_tweets.id.author_id,author_id',
+                'user.fields': 'id,username,name,profile_image_url,verified,verified_type',
+                'tweet.fields': 'created_at,entities,author_id,conversation_id,in_reply_to_user_id,referenced_tweets'
             }
             
             if since_id:
@@ -245,8 +245,15 @@ class XAPIv2Client:
                             'username': user['username'],
                             'name': user['name'],
                             'profile_image_url': user.get('profile_image_url'),
-                            'verified': user.get('verified', False)
+                            'verified': user.get('verified', False),
+                            'verified_type': user.get('verified_type')
                         }
+                
+                # Create tweets lookup from expansions for referenced tweets
+                tweets_by_id = {}
+                if 'includes' in data and 'tweets' in data['includes']:
+                    for tweet in data['includes']['tweets']:
+                        tweets_by_id[tweet['id']] = tweet
                 
                 # Process mentions and attach user data
                 for mention in data['data']:
@@ -268,6 +275,19 @@ class XAPIv2Client:
                                         break
                         mention_data['mentioned_users'] = mentioned_users
                     
+                    # Attach referenced tweets (parent tweets)
+                    if 'referenced_tweets' in mention:
+                        referenced_tweets = []
+                        for ref_tweet in mention['referenced_tweets']:
+                            ref_id = ref_tweet.get('id')
+                            if ref_id and ref_id in tweets_by_id:
+                                parent_tweet = tweets_by_id[ref_id].copy()
+                                # Attach parent author info
+                                if 'author_id' in parent_tweet and parent_tweet['author_id'] in users_by_id:
+                                    parent_tweet['author'] = users_by_id[parent_tweet['author_id']]
+                                referenced_tweets.append(parent_tweet)
+                        mention_data['referenced_tweets'] = referenced_tweets
+                    
                     # Cache user data
                     if 'author' in mention_data:
                         user_info = UserInfo(
@@ -283,11 +303,12 @@ class XAPIv2Client:
             print(f"Retrieved {len(mentions)} mentions with expanded user data")
             self._maybe_sleep('users/mentions')
             
-            # Return mentions with includes.users for batch processing
+            # Return mentions with includes.users and includes.tweets for batch processing
             result = {
                 "tweets": mentions,
                 "includes": {
-                    "users": data.get('includes', {}).get('users', [])
+                    "users": data.get('includes', {}).get('users', []),
+                    "tweets": data.get('includes', {}).get('tweets', [])
                 }
             }
             return result
@@ -296,7 +317,7 @@ class XAPIv2Client:
             print(f"Error getting mentions: {e}")
             return {
                 "tweets": [],
-                "includes": {"users": []}
+                "includes": {"users": [], "tweets": []}
             }
     
     def media_upload(self, image_bytes: bytes, mime: str = "image/jpeg") -> str:
