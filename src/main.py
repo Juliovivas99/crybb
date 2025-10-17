@@ -120,17 +120,41 @@ class CryBBBot:
             conversation_id = tweet_data.get('conversation_id')
             in_reply_to_user_id = tweet_data.get('in_reply_to_user_id')
             
-            print(f"Processing mention from {author_id}: {tweet_text}")
+            # CRITICAL FIX: Enhanced debug logging to show what we're actually processing
+            author_username = (tweet_data.get('author') or {}).get('username') or 'unknown'
+            print(f"[MENTION PROCESSING] Processing tweet_id={tweet_id} author=@{author_username} text=\"{tweet_text}\"")
             
-            # Build typed mentions and check for @bot
+            # CRITICAL FIX: Validate that this tweet actually contains @bot mentions in its own text
+            # Don't process referenced tweets or parent tweets - only the actual mention tweet
             bot_handle_lc = (self.bot_handle or Config.BOT_HANDLE).lstrip("@").lower()
             typed = typed_mentions(tweet_data)
             
-            # Check if @bot is in typed mentions
+            # CRITICAL FIX: Verify the tweet text actually contains @bot mentions
+            # This prevents processing wrong tweets in conversation threads
             bot_in_typed = any(m["username"] == bot_handle_lc for m in typed)
             if not bot_in_typed:
-                print("[SKIP] No @bot in typed mentions; ignoring")
+                print(f"[SKIP] No @bot in typed mentions for tweet_id={tweet_id}; ignoring")
+                print(f"[SKIP] Tweet text: \"{tweet_text}\"")
+                print(f"[SKIP] Typed mentions: {[m['username'] for m in typed]}")
                 return
+            
+            # CRITICAL FIX: Additional validation - ensure we're not processing referenced tweets
+            # Check if this tweet has referenced tweets and warn if we're processing the wrong one
+            referenced_tweets = tweet_data.get('referenced_tweets', [])
+            if referenced_tweets:
+                print(f"[WARNING] Tweet {tweet_id} has referenced tweets: {[rt.get('id') for rt in referenced_tweets]}")
+                print(f"[WARNING] Make sure we're processing the actual mention tweet, not a referenced tweet")
+                
+                # CRITICAL FIX: Double-check that we're not accidentally processing a referenced tweet
+                # If the tweet text doesn't contain @bot but we found @bot in typed mentions,
+                # we might be processing the wrong tweet data
+                if not any(f"@{bot_handle_lc}" in tweet_text.lower() for bot_handle_lc in [self.bot_handle.lstrip("@").lower(), Config.BOT_HANDLE.lstrip("@").lower()]):
+                    print(f"[CRITICAL ERROR] Tweet {tweet_id} has referenced tweets but its own text doesn't contain @bot!")
+                    print(f"[CRITICAL ERROR] This suggests we're processing the wrong tweet in the conversation thread!")
+                    print(f"[CRITICAL ERROR] Tweet text: \"{tweet_text}\"")
+                    return
+            
+            print(f"[VALIDATION PASSED] Tweet {tweet_id} contains @bot mention in its own text")
             
             # Check if this is a reply to bot
             reply_to_bot = is_reply_to_bot(tweet_data, self.bot_id)
@@ -166,11 +190,19 @@ class CryBBBot:
                     tweet_data, bot_handle_lc, author_id, in_reply_to_user_id
                 )
             
-            # Enhanced debug logging
+            # Enhanced debug logging with tweet validation
             author_username = (tweet_data.get('author') or {}).get('username') or ''
             print(f"[MENTION DEBUG] id={tweet_id} conv={conversation_id} reply_to={in_reply_to_user_id} "
                   f"author=@{author_username} target=@{target_username or 'None'} reason=\"{reason}\" "
                   f"text=\"{tweet_text}\" parent_author={parent_author_id}")
+            
+            # CRITICAL FIX: Final validation - ensure tweet text matches what we're processing
+            # This prevents processing wrong tweets in conversation threads
+            if tweet_text and not any(bot_handle_lc in tweet_text.lower() for bot_handle_lc in [self.bot_handle.lstrip("@").lower(), Config.BOT_HANDLE.lstrip("@").lower()]):
+                print(f"[CRITICAL ERROR] Tweet {tweet_id} text does not contain @bot mention!")
+                print(f"[CRITICAL ERROR] Tweet text: \"{tweet_text}\"")
+                print(f"[CRITICAL ERROR] Expected bot handles: @{self.bot_handle}, @{Config.BOT_HANDLE}")
+                return
             
             if not target_username:
                 print(f"[SKIP] {reason}")
