@@ -167,7 +167,7 @@ class CryBBBot:
             else:
                 # Not replying to bot: determine behavior based on mention count
                 if len(typed) >= 3:
-                    # Allow @bot + @user pattern anywhere, OR @bot first (existing behavior)
+                    # For 3+ mentions: allow @bot + @user pattern ANYWHERE in the tweet
                     bot_positions = [i for i, m in enumerate(typed) if m["username"] == bot_handle_lc]
                     if not bot_positions:
                         print("[SKIP] @bot not found in tweet with 3+ mentions")
@@ -181,25 +181,28 @@ class CryBBBot:
                             if gap.strip() == "+" and typed[bot_idx + 1]["username"] != bot_handle_lc:
                                 # Found @bot + @user pattern
                                 pattern_found = True
+                                print(f"[PATTERN MATCHED] @bot + @user (3+ mentions, position {bot_idx})")
                                 break
                     
-                    # If no + pattern found, check if @bot is first (existing behavior)
-                    if not pattern_found and typed[0]["username"] == bot_handle_lc:
-                        pattern_found = True
-                        print("[PATTERN MATCHED] @bot first (3+ mentions, existing behavior)")
-                    elif not pattern_found:
+                    if not pattern_found:
                         print("[SKIP] No @bot + @user pattern found in tweet with 3+ mentions")
                         return
-                    else:
-                        print("[PATTERN MATCHED] @bot + @user (3+ mentions)")
 
                 else:
-                    # For <3 mentions: require @bot as FIRST typed mention
+                    # For <3 mentions: require @bot as FIRST mention AND check for + pattern
                     if not typed or typed[0]["username"] != bot_handle_lc:
-                        print("[SKIP] @bot not first typed mention in top-level tweet")
+                        print("[SKIP] @bot not first typed mention in tweet with <3 mentions")
                         return
 
-                    print("[PATTERN MATCHED] @bot first (<3 mentions)")
+                    # Check for @bot + @user pattern (must be first)
+                    if len(typed) >= 2:
+                        gap = tweet_text[typed[0]["end"]:typed[1]["start"]]
+                        if gap.strip() != "+":
+                            print("[SKIP] Missing '+' symbol between @bot and @user in tweet with <3 mentions")
+                            return
+                        print("[PATTERN MATCHED] @bot + @user (<3 mentions, @bot first)")
+                    else:
+                        print("[PATTERN MATCHED] @bot only mention")
                 
                 print(f"[MENTION DEBUG] Checking pattern: {tweet_text}")
                 target_username, reason = extract_target_after_last_bot(
@@ -436,14 +439,25 @@ class CryBBBot:
                         if self.storage.is_processed(tid):
                             success_ids.add(tid)
                     
+                    # Log every mention retrieved from Twitter API
+                    print(f"[BATCH DEBUG] Retrieved {len(oldest_first)} mentions from Twitter API")
+                    for i, m in enumerate(oldest_first):
+                        tid = m["id"]
+                        author_username = (m.get('author') or {}).get('username') or 'unknown'
+                        tweet_text = m.get('text', '')
+                        is_already_processed = tid in success_ids
+                        print(f"[MENTION {i+1}/{len(oldest_first)}] ID={tid} author=@{author_username} text=\"{tweet_text[:50]}...\" processed={is_already_processed}")
+                    
                     for m in oldest_first:
                         tid = m["id"]
                         if tid in success_ids:
                             # Already processed earlier (or in previous runs)
+                            print(f"[SKIP] Tweet {tid} already processed in previous run")
                             continue
                         
                         try:
                             # ---- your existing routing (AI vs overlay vs text rules) is inside process_mention() ----
+                            print(f"[PROCESSING] Starting processing for tweet {tid}")
                             self.process_mention(m, ctx)
                             self.storage.mark_processed(tid)
                             success_ids.add(tid)

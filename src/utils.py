@@ -132,9 +132,9 @@ def extract_target_after_last_bot(
     if not bot_idxs:
         return None, "bot-not-in-text"
 
-    # Determine if '+' is required based on total mentions and bot position
-    # For 3+ mentions: require + UNLESS bot is first (existing behavior)
-    require_plus = len(typed) > 2 and bot_idxs[0] != 0
+    # Determine if '+' is required based on total mentions
+    # Always require + symbol between @bot and @user
+    require_plus = True
 
     i = bot_idxs[-1]  # last @bot mention index
     if i + 1 >= len(typed):
