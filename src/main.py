@@ -162,7 +162,7 @@ class CryBBBot:
                         return
                 
                 target_username, reason = extract_target_after_last_bot(
-                    tweet_data, bot_handle_lc, author_id, in_reply_to_user_id
+                    tweet_data, bot_handle_lc, author_id, in_reply_to_user_id, len(typed)
                 )
             else:
                 # Not replying to bot: determine behavior based on mention count
@@ -189,24 +189,24 @@ class CryBBBot:
                         return
 
                 else:
-                    # For <3 mentions: require @bot as FIRST mention AND check for + pattern
+                    # For <3 mentions: require @bot as FIRST mention, + symbol is OPTIONAL
                     if not typed or typed[0]["username"] != bot_handle_lc:
                         print("[SKIP] @bot not first typed mention in tweet with <3 mentions")
                         return
 
-                    # Check for @bot + @user pattern (must be first)
+                    # Check for @bot + @user pattern (must be first), + is optional
                     if len(typed) >= 2:
                         gap = tweet_text[typed[0]["end"]:typed[1]["start"]]
-                        if gap.strip() != "+":
-                            print("[SKIP] Missing '+' symbol between @bot and @user in tweet with <3 mentions")
-                            return
-                        print("[PATTERN MATCHED] @bot + @user (<3 mentions, @bot first)")
+                        if gap.strip() == "+":
+                            print("[PATTERN MATCHED] @bot + @user (<3 mentions, @bot first, with +)")
+                        else:
+                            print("[PATTERN MATCHED] @bot @user (<3 mentions, @bot first, no + needed)")
                     else:
                         print("[PATTERN MATCHED] @bot only mention")
                 
                 print(f"[MENTION DEBUG] Checking pattern: {tweet_text}")
                 target_username, reason = extract_target_after_last_bot(
-                    tweet_data, bot_handle_lc, author_id, in_reply_to_user_id
+                    tweet_data, bot_handle_lc, author_id, in_reply_to_user_id, len(typed)
                 )
             
             # Enhanced debug logging with tweet validation

@@ -110,6 +110,7 @@ def extract_target_after_last_bot(
     bot_handle_lc: str,
     author_id: Optional[str],
     in_reply_to_user_id: Optional[str],
+    total_mentions: Optional[int] = None,
 ) -> Tuple[Optional[str], str]:
     """
     Extract target after the last @bot mention with conversation-aware logic.
@@ -119,6 +120,7 @@ def extract_target_after_last_bot(
         bot_handle_lc: Bot handle in lowercase
         author_id: Tweet author ID
         in_reply_to_user_id: ID of user being replied to
+        total_mentions: Total number of mentions in the tweet (used to determine if + is required)
         
     Returns:
         Tuple of (target_username, reason) or (None, reason)
@@ -133,8 +135,15 @@ def extract_target_after_last_bot(
         return None, "bot-not-in-text"
 
     # Determine if '+' is required based on total mentions
-    # Always require + symbol between @bot and @user
-    require_plus = True
+    # For tweets with 2 mentions or less: + is OPTIONAL
+    # For tweets with 3+ mentions: + is REQUIRED
+    if total_mentions is not None:
+        require_plus = total_mentions >= 3
+        print(f"[MENTION LOGIC] Total mentions: {total_mentions}, require_plus: {require_plus}")
+    else:
+        # Fallback: use total typed mentions if not provided
+        require_plus = len(typed) >= 3
+        print(f"[MENTION LOGIC] Using typed mentions: {len(typed)}, require_plus: {require_plus}")
 
     i = bot_idxs[-1]  # last @bot mention index
     if i + 1 >= len(typed):
