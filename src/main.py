@@ -276,7 +276,7 @@ class CryBBBot:
             )
             
             # Reply with processed image
-            reply_text = f"Welcome to $CRYBB @{target_username} 🍼\n\nNO CRYING IN THE CASINO."
+            reply_text = format_friendly_message(target_username)
             reply_result = self.twitter_client.reply_with_image(tweet_id, reply_text, image_bytes)
             
             # Record conversation de-dupe after successful reply

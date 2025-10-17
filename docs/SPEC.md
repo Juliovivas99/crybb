@@ -24,7 +24,7 @@ Notes from code:
 
 ```176:186:/Users/juliovivas/Vscode/crybb/src/main.py
 # Reply with processed image
-reply_text = f"Here's your CryBB PFP @{target_username} 🍼"
+reply_text = f"Welcome to $CRYBB @{target_username} 🍼\n\nNO CRYING IN THE CASINO."
 self.twitter_client.reply_with_image(tweet_id, reply_text, image_bytes)
 
 # Update metrics
