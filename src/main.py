@@ -165,11 +165,43 @@ class CryBBBot:
                     tweet_data, bot_handle_lc, author_id, in_reply_to_user_id
                 )
             else:
-                # Not replying to bot: require @bot as FIRST typed mention
-                if typed[0]["username"] != bot_handle_lc:
-                    print("[SKIP] @bot not first typed mention in top-level tweet")
-                    return
+                # Not replying to bot: determine behavior based on mention count
+                if len(typed) >= 3:
+                    # Allow @bot + @user pattern anywhere, OR @bot first (existing behavior)
+                    bot_positions = [i for i, m in enumerate(typed) if m["username"] == bot_handle_lc]
+                    if not bot_positions:
+                        print("[SKIP] @bot not found in tweet with 3+ mentions")
+                        return
+
+                    pattern_found = False
+                    # Check for @bot + @user pattern anywhere
+                    for bot_idx in bot_positions:
+                        if bot_idx + 1 < len(typed):
+                            gap = tweet_text[typed[bot_idx]["end"]:typed[bot_idx + 1]["start"]]
+                            if gap.strip() == "+" and typed[bot_idx + 1]["username"] != bot_handle_lc:
+                                # Found @bot + @user pattern
+                                pattern_found = True
+                                break
+                    
+                    # If no + pattern found, check if @bot is first (existing behavior)
+                    if not pattern_found and typed[0]["username"] == bot_handle_lc:
+                        pattern_found = True
+                        print("[PATTERN MATCHED] @bot first (3+ mentions, existing behavior)")
+                    elif not pattern_found:
+                        print("[SKIP] No @bot + @user pattern found in tweet with 3+ mentions")
+                        return
+                    else:
+                        print("[PATTERN MATCHED] @bot + @user (3+ mentions)")
+
+                else:
+                    # For <3 mentions: require @bot as FIRST typed mention
+                    if not typed or typed[0]["username"] != bot_handle_lc:
+                        print("[SKIP] @bot not first typed mention in top-level tweet")
+                        return
+
+                    print("[PATTERN MATCHED] @bot first (<3 mentions)")
                 
+                print(f"[MENTION DEBUG] Checking pattern: {tweet_text}")
                 target_username, reason = extract_target_after_last_bot(
                     tweet_data, bot_handle_lc, author_id, in_reply_to_user_id
                 )

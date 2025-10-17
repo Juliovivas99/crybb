@@ -127,13 +127,14 @@ def extract_target_after_last_bot(
     if not tlc or not typed:
         return None, "no-mentions-or-text"
 
-    # Determine if '+' is required based on total mentions
-    require_plus = len(typed) > 2
-
     # Find last @bot mention
     bot_idxs = [i for i, m in enumerate(typed) if m["username"] == bot_handle_lc]
     if not bot_idxs:
         return None, "bot-not-in-text"
+
+    # Determine if '+' is required based on total mentions and bot position
+    # For 3+ mentions: require + UNLESS bot is first (existing behavior)
+    require_plus = len(typed) > 2 and bot_idxs[0] != 0
 
     i = bot_idxs[-1]  # last @bot mention index
     if i + 1 >= len(typed):
