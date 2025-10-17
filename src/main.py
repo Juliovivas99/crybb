@@ -204,16 +204,18 @@ class CryBBBot:
                     else:
                         print("[PATTERN MATCHED] @bot only mention")
                 
-                print(f"[MENTION DEBUG] Checking pattern: {tweet_text}")
+                if Config.DEBUG_MODE:
+                    print(f"[MENTION DEBUG] Checking pattern: {tweet_text}")
                 target_username, reason = extract_target_after_last_bot(
                     tweet_data, bot_handle_lc, author_id, in_reply_to_user_id, len(typed)
                 )
             
             # Enhanced debug logging with tweet validation
             author_username = (tweet_data.get('author') or {}).get('username') or ''
-            print(f"[MENTION DEBUG] id={tweet_id} conv={conversation_id} reply_to={in_reply_to_user_id} "
-                  f"author=@{author_username} target=@{target_username or 'None'} reason=\"{reason}\" "
-                  f"text=\"{tweet_text}\" parent_author={parent_author_id}")
+            if Config.DEBUG_MODE:
+                print(f"[MENTION DEBUG] id={tweet_id} conv={conversation_id} reply_to={in_reply_to_user_id} "
+                      f"author=@{author_username} target=@{target_username or 'None'} reason=\"{reason}\" "
+                      f"text=\"{tweet_text}\" parent_author={parent_author_id}")
             
             # CRITICAL FIX: Final validation - ensure tweet text matches what we're processing
             # This prevents processing wrong tweets in conversation threads
@@ -252,7 +254,8 @@ class CryBBBot:
             normalized_username = normalize(author_username) if author_username else ""
             is_whitelisted = normalized_username in Config.WHITELIST_HANDLES
             
-            print(f"[DEBUG] Processing mention from user @{author_username}")
+            if Config.DEBUG_MODE:
+                print(f"[DEBUG] Processing mention from user @{author_username}")
             
             # Additional validation
             from src.per_user_limiter import normalize
@@ -312,7 +315,16 @@ class CryBBBot:
             
             # Reply with processed image
             reply_text = format_friendly_message(target_username)
-            reply_result = self.twitter_client.reply_with_image(tweet_id, reply_text, image_bytes)
+            reply_to_id = conversation_id if conversation_id else tweet_id
+            
+            # Enhanced logging to show reply target decision
+            if conversation_id and conversation_id != tweet_id:
+                print(f"[REPLY STRATEGY] Using conversation_id {conversation_id} (root tweet) instead of tweet_id {tweet_id} (intermediate reply)")
+                print(f"[REPLY STRATEGY] This ensures the reply appears directly under the original tweet")
+            else:
+                print(f"[REPLY STRATEGY] Using tweet_id {tweet_id} (no conversation or same as root)")
+
+            reply_result = self.twitter_client.reply_with_image(reply_to_id, reply_text, image_bytes)
             
             # Record conversation de-dupe after successful reply
             if conversation_id:
@@ -401,7 +413,8 @@ class CryBBBot:
                 users = includes.get("users", []) or []
                 
                 if mentions:
-                    print(f"Found {len(mentions)} mentions")
+                    if Config.DEBUG_MODE:
+                        print(f"Found {len(mentions)} mentions")
                     
                     # Build batch snapshot from includes.users
                     from src.x_v2 import _normalize_user_min
@@ -411,7 +424,8 @@ class CryBBBot:
                     }
                     
                     ctx = ProcessingContext(batch_users=batch_users)
-                    print(f"Built batch snapshot: users={len(batch_users)}")
+                    if Config.DEBUG_MODE:
+                        print(f"Built batch snapshot: users={len(batch_users)}")
                     
                     # Process mentions with contiguous success tracking
                     processed_ids = self.storage.read_processed_ids()
@@ -440,13 +454,14 @@ class CryBBBot:
                             success_ids.add(tid)
                     
                     # Log every mention retrieved from Twitter API
-                    print(f"[BATCH DEBUG] Retrieved {len(oldest_first)} mentions from Twitter API")
-                    for i, m in enumerate(oldest_first):
-                        tid = m["id"]
-                        author_username = (m.get('author') or {}).get('username') or 'unknown'
-                        tweet_text = m.get('text', '')
-                        is_already_processed = tid in success_ids
-                        print(f"[MENTION {i+1}/{len(oldest_first)}] ID={tid} author=@{author_username} text=\"{tweet_text[:50]}...\" processed={is_already_processed}")
+                    if Config.DEBUG_MODE:
+                        print(f"[BATCH DEBUG] Retrieved {len(oldest_first)} mentions from Twitter API")
+                        for i, m in enumerate(oldest_first):
+                            tid = m["id"]
+                            author_username = (m.get('author') or {}).get('username') or 'unknown'
+                            tweet_text = m.get('text', '')
+                            is_already_processed = tid in success_ids
+                            print(f"[MENTION {i+1}/{len(oldest_first)}] ID={tid} author=@{author_username} text=\"{tweet_text[:50]}...\" processed={is_already_processed}")
                     
                     for m in oldest_first:
                         tid = m["id"]
