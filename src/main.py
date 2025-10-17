@@ -4,6 +4,8 @@ Handles mention polling, processing, and replying with intelligent rate limiting
 """
 import time
 import threading
+import sys
+import os
 from typing import Optional
 from src.config import Config
 from src.twitter_factory import make_twitter_client
@@ -27,18 +29,37 @@ class CryBBBot:
     
     def __init__(self):
         """Initialize the bot."""
+        print("Creating Twitter client...")
         self.twitter_client = make_twitter_client()
+        print("✓ Twitter client created")
+        
+        print("Creating image processor...")
         self.image_processor = ImageProcessor()
+        print("✓ Image processor created")
+        
+        print("Creating orchestrator...")
         self.orchestrator = Orchestrator(Config)
+        print("✓ Orchestrator created")
+        
+        print("Creating rate limiter...")
         self.rate_limiter = RateLimiter()
+        print("✓ Rate limiter created")
+        
+        print("Creating storage...")
         self.storage = Storage()
+        print("✓ Storage created")
+        
+        print("Creating user limiter...")
         self.user_limiter = PerUserLimiter(Config.PER_TARGET_HOURLY_LIMIT, 3600)
+        print("✓ User limiter created")
+        
         self.sleeper_mode = False
         self.last_retweeted_id = None
         
         # Get bot identity
+        print("Getting bot identity...")
         self.bot_id, self.bot_handle = self.twitter_client.get_bot_identity()
-        print(f"Bot initialized: @{self.bot_handle} (ID: {self.bot_id})")
+        print(f"✓ Bot initialized: @{self.bot_handle} (ID: {self.bot_id})")
     
     def resolve_target_user(self, target_username: str, ctx: ProcessingContext) -> dict | None:
         """Resolve target user with batch-first resolution strategy."""
@@ -212,7 +233,7 @@ class CryBBBot:
             )
             
             # Reply with processed image
-            reply_text = f"Here's your CryBB PFP @{target_username} 🍼"
+            reply_text = f"Welcome to $CRYBB @{target_username} 🍼\n\nNO CRYING IN THE CASINO."
             reply_result = self.twitter_client.reply_with_image(tweet_id, reply_text, image_bytes)
             # Optional success log
             try:
@@ -475,12 +496,28 @@ class CryBBBot:
 def main():
     """Main entry point."""
     try:
+        print("=== CryBB Bot Starting ===")
+        print(f"Python version: {sys.version}")
+        print(f"Working directory: {os.getcwd()}")
+        print(f"Python path: {sys.path}")
+        
+        # Validate configuration before proceeding
+        print("Validating configuration...")
+        Config.validate()
+        print("✓ Configuration validation passed")
+        
+        print("Initializing bot...")
         bot = CryBBBot()
+        print("✓ Bot initialization completed")
+        
+        print("Starting bot...")
         bot.start()
     except KeyboardInterrupt:
         print("Bot stopped by user")
     except Exception as e:
         print(f"Fatal error: {e}")
+        import traceback
+        traceback.print_exc()
         raise
 
 if __name__ == "__main__":

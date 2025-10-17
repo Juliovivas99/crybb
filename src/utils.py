@@ -178,9 +178,9 @@ def extract_target_username(text: str, bot_handle: str) -> Optional[str]:
 def format_friendly_message(target_username: Optional[str] = None) -> str:
     """Format a friendly reply message."""
     if target_username:
-        return f"Here's your CryBB PFP @{target_username} 🍼"
+        return f"Welcome to $CRYBB @{target_username} 🍼\n\nNO CRYING IN THE CASINO."
     else:
-        return "Here's your CryBB PFP 🍼"
+        return "Welcome to $CRYBB 🍼\n\nNO CRYING IN THE CASINO."
 
 def format_rate_limit_message() -> str:
     """Format a friendly rate limit message."""

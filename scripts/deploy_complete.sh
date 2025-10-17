@@ -72,7 +72,7 @@ upload_files() {
 run_deployment() {
     log_info "Starting deployment on droplet $DROPLET_IP..."
     
-    ssh root@$DROPLET_IP << 'EOF'
+    ssh root@$DROPLET_IP << EOF
         set -e
         
         # Colors for remote output
@@ -81,6 +81,12 @@ run_deployment() {
         YELLOW='\033[1;33m'
         BLUE='\033[0;34m'
         NC='\033[0m'
+
+        # Injected config variables from local script
+        APP_DIR="$APP_DIR"
+        SERVICE_NAME="$SERVICE_NAME"
+        DEPLOY_USER="$DEPLOY_USER"
+        REPO_URL="$REPO_URL"
         
         log_info() {
             echo -e "${BLUE}[INFO]${NC} $1"
