@@ -182,10 +182,11 @@ class CryBBBot:
             if normalize(target_username) == normalize(Config.BOT_HANDLE):
                 print("[SKIP] Target is bot handle")
                 return
-            author_username_lc = (tweet_data.get('author') or {}).get('username') or ''
-            if author_username_lc.lower() == (target_username or "").lower():
-                print("[SKIP] Target is tweet author (self-PFP)")
-                return
+            # Allow self-PFP requests - users can tweet at themselves
+            # author_username_lc = (tweet_data.get('author') or {}).get('username') or ''
+            # if author_username_lc.lower() == (target_username or "").lower():
+            #     print("[SKIP] Target is tweet author (self-PFP)")
+            #     return
 
             if Config.DEBUG_MENTIONS:
                 au = (tweet_data.get('author') or {}).get('username') or ''
