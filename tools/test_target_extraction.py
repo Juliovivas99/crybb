@@ -25,7 +25,7 @@ def test_typed_mentions():
             ]
         }
     }
-    typed = typed_mentions(tweet)
+    tlc, typed = typed_mentions(tweet)
     assert len(typed) == 2
     assert typed[0]["username"] == "crybbmaker"
     assert typed[1]["username"] == "alice"
@@ -115,7 +115,7 @@ def test_reply_to_bot_no_explicit_pair():
     }
     target, reason = extract_target_after_last_bot(tweet, "crybbmaker", "111", "bot")
     assert target is None
-    assert reason == "no-typed-mentions"
+    assert reason == "no-mentions-or-text"
 
 
 def test_reply_to_bot_explicit_pair():
@@ -432,6 +432,24 @@ def test_multiple_bots_last_with_plus():
     assert "immediate after last @bot" in reason
 
 
+def test_plain_text_reply_with_ghost_entities_is_skipped():
+    """Test that tweets with ghost/merged entities are properly skipped."""
+    # Text has NO mentions; entities claim there are mentions (simulating merged refs)
+    tweet = {
+        "text": "NO CRYING IN THE CASINO!",
+        "author_id": "111",
+        "entities": {"mentions": [
+            {"username": "crybbmaker", "start": 0, "end": 11},  # bogus offsets
+            {"username": "alice", "start": 12, "end": 18},      # bogus offsets
+        ]},
+        # No in_reply_to is required for this test—goal is to ensure mismatch is ignored
+    }
+    target, reason = extract_target_after_last_bot(tweet, "crybbmaker", "111", None)
+    assert target is None
+    # Reason can be "no-mentions-or-text" or "bot-not-in-text" depending on your extractor—either way, not a target.
+    assert isinstance(reason, str) and len(reason) > 0
+
+
 if __name__ == "__main__":
     # Test helper functions
     test_typed_mentions()
@@ -456,6 +474,9 @@ if __name__ == "__main__":
     # Test conversation context
     test_conversation_id_preserved()
     test_parent_author_extraction()
+    
+    # Test merged-entity bug prevention
+    test_plain_text_reply_with_ghost_entities_is_skipped()
     
     # Legacy tests (keeping for compatibility)
     test_two_mentions()

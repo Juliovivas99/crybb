@@ -73,17 +73,25 @@ def extract_target_after_bot(
     return None
 
 
-def _typed_mentions(tweet: Dict[str, Any]) -> tuple[str, List[Dict[str, Any]]]:
-    text = (tweet.get("text") or "")
+def typed_mentions(tweet: Dict[str, Any]) -> Tuple[str, List[Dict[str, Any]]]:
+    """
+    Return (lowercased_text, typed_mentions) where typed_mentions are ONLY those
+    whose entity offsets exactly equal '@{username}' slice in the current tweet text.
+    This prevents 'merged' or 'ghost' mentions coming from referenced/parent tweets.
+    """
+    text: str = (tweet.get("text") or "")
     tlc = text.lower()
     ents: List[Dict[str, Any]] = (tweet.get("entities") or {}).get("mentions") or []
+
     typed: List[Dict[str, Any]] = []
     for m in ents:
         s, e = m.get("start"), m.get("end")
         uname = (m.get("username") or "").lower()
-        if isinstance(s, int) and isinstance(e, int) and 0 <= s < e <= len(text):
+        if isinstance(s, int) and isinstance(e, int) and 0 <= s < e <= len(text) and uname:
+            # Accept ONLY if the actual slice equals '@{username}'
             if tlc[s:e] == f"@{uname}":
                 typed.append({"start": s, "end": e, "username": uname, "id": m.get("id")})
+
     typed.sort(key=lambda m: m["start"])
     return tlc, typed
 
@@ -115,9 +123,9 @@ def extract_target_after_last_bot(
     Returns:
         Tuple of (target_username, reason) or (None, reason)
     """
-    typed = typed_mentions(tweet)
-    if not typed:
-        return None, "no-typed-mentions"
+    tlc, typed = typed_mentions(tweet)
+    if not tlc or not typed:
+        return None, "no-mentions-or-text"
 
     # Find the last typed @bot anywhere in the text
     bot_idxs = [i for i, m in enumerate(typed) if m["username"] == bot_handle_lc]
@@ -209,43 +217,6 @@ def format_error_message() -> str:
     return "Oops! Something went wrong while processing your request. Please try again later! 🙏"
 
 
-def typed_mentions(tweet: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """
-    Extract typed mentions that exactly match the text at their positions.
-    Returns only entities whose text[start:end] is exactly "@{username.lower()}".
-    
-    Args:
-        tweet: Tweet data with text and entities
-        
-    Returns:
-        List of typed mention dicts with start, end, username, id
-    """
-    text = tweet.get("text", "") or ""
-    text_lower = text.lower()
-    entities = tweet.get("entities", {})
-    mentions = entities.get("mentions", [])
-    
-    typed = []
-    for mention in mentions:
-        start = mention.get("start")
-        end = mention.get("end")
-        username = mention.get("username", "").lower()
-        mention_id = mention.get("id")
-        
-        # Validate position and exact text match
-        if (isinstance(start, int) and isinstance(end, int) and 
-            0 <= start < end <= len(text)):
-            if text_lower[start:end] == f"@{username}":
-                typed.append({
-                    "start": start,
-                    "end": end,
-                    "username": username,
-                    "id": mention_id
-                })
-    
-    # Sort by position in text
-    typed.sort(key=lambda m: m["start"])
-    return typed
 
 
 def is_reply_to_bot(tweet: Dict[str, Any], bot_id: str) -> bool:
