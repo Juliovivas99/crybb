@@ -86,7 +86,7 @@ def test_top_level_bot_not_first():
 
 def test_top_level_multiple_bots():
     """multiple @bot … choose last bot's immediate next mention"""
-    t = "@crybbmaker @alice hi @crybbmaker @bob"
+    t = "@crybbmaker @alice hi @crybbmaker + @bob"
     tweet = {
         "text": t,
         "author_id": "111",
@@ -94,13 +94,13 @@ def test_top_level_multiple_bots():
             ent("crybbmaker", 0, 11, "bot"),
             ent("alice", 12, 18, "222"),
             ent("crybbmaker", 22, 33, "bot"),
-            ent("bob", 34, 38, "333"),
+            ent("bob", 36, 40, "333"),
         ]},
         "includes": {"users": [inc("111", "author"), inc("222", "alice"), inc("333", "bob")]},
     }
     target, reason = extract_target_after_last_bot(tweet, "crybbmaker", "111", None)
     assert target == "bob"
-    assert "immediate after last @bot" in reason
+    assert "require-plus" in reason
 
 
 # REPLY TO BOT TESTS
@@ -405,8 +405,8 @@ def test_reply_three_mentions_without_plus_skip():
         "includes": {"users": [inc("111", "author"), inc("222", "alice"), inc("333", "extra")]},
     }
     target, reason = extract_target_after_last_bot(tweet, "crybbmaker", "111", "999")
-    assert target == "alice"  # New logic allows this without requiring +
-    assert "immediate after last @bot" in reason
+    assert target is None  # New logic requires + for 3+ mentions
+    assert reason == "require-plus-gap-missing"
 
 
 # 11) Multiple bots, pick last bot immediate next with plus
@@ -429,7 +429,7 @@ def test_multiple_bots_last_with_plus():
     }
     target, reason = extract_target_after_last_bot(tweet, "crybbmaker", "111", "999")
     assert target == "b"
-    assert "immediate after last @bot" in reason
+    assert "require-plus" in reason
 
 
 def test_plain_text_reply_with_ghost_entities_is_skipped():
@@ -448,6 +448,44 @@ def test_plain_text_reply_with_ghost_entities_is_skipped():
     assert target is None
     # Reason can be "no-mentions-or-text" or "bot-not-in-text" depending on your extractor—either way, not a target.
     assert isinstance(reason, str) and len(reason) > 0
+
+
+def test_plus_rule_immediate_after_last_bot():
+    """Test the new plus rule logic for immediate mentions after last bot."""
+    # Case 1: 3 mentions with '+'
+    tweet = {
+        "text": "@crybbmaker + @alice @bob",
+        "entities": {"mentions": [
+            {"username": "crybbmaker", "start": 0, "end": 11},
+            {"username": "alice", "start": 14, "end": 20},
+            {"username": "bob", "start": 21, "end": 25},
+        ]},
+    }
+    target, reason = extract_target_after_last_bot(tweet, "crybbmaker", "111", None)
+    assert target == "alice"
+    assert "require-plus" in reason
+
+    # Case 2: 3 mentions without '+'
+    tweet["text"] = "@crybbmaker @alice @bob"
+    tweet["entities"]["mentions"] = [
+        {"username": "crybbmaker", "start": 0, "end": 11},
+        {"username": "alice", "start": 12, "end": 18},
+        {"username": "bob", "start": 19, "end": 23},
+    ]
+    target, reason = extract_target_after_last_bot(tweet, "crybbmaker", "111", None)
+    assert target is None
+    assert reason == "require-plus-gap-missing"
+
+    # Case 3: @bot not first but still valid last bot rule
+    tweet["text"] = "@bob @crybbmaker + @alice"
+    tweet["entities"]["mentions"] = [
+        {"username": "bob", "start": 0, "end": 4},
+        {"username": "crybbmaker", "start": 5, "end": 16},
+        {"username": "alice", "start": 19, "end": 25},
+    ]
+    target, reason = extract_target_after_last_bot(tweet, "crybbmaker", "111", None)
+    assert target == "alice"
+    assert "require-plus" in reason
 
 
 if __name__ == "__main__":
@@ -477,6 +515,9 @@ if __name__ == "__main__":
     
     # Test merged-entity bug prevention
     test_plain_text_reply_with_ghost_entities_is_skipped()
+    
+    # Test new plus rule logic
+    test_plus_rule_immediate_after_last_bot()
     
     # Legacy tests (keeping for compatibility)
     test_two_mentions()

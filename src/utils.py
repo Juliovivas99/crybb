@@ -127,25 +127,34 @@ def extract_target_after_last_bot(
     if not tlc or not typed:
         return None, "no-mentions-or-text"
 
-    # Find the last typed @bot anywhere in the text
+    # Determine if '+' is required based on total mentions
+    require_plus = len(typed) > 2
+
+    # Find last @bot mention
     bot_idxs = [i for i, m in enumerate(typed) if m["username"] == bot_handle_lc]
     if not bot_idxs:
         return None, "bot-not-in-text"
-    i = bot_idxs[-1]
 
-    # Need an immediate next typed mention
+    i = bot_idxs[-1]  # last @bot mention index
     if i + 1 >= len(typed):
         return None, "no-next-mention"
-    nxt = typed[i + 1]
+
+    nxt = typed[i + 1]  # immediate mention after bot
+    gap = tlc[typed[i]["end"]:nxt["start"]]
+
+    # Enforce + logic
+    if require_plus:
+        if not re.fullmatch(r"[ \t\r\n]*\+[ \t\r\n]*", gap or ""):
+            return None, "require-plus-gap-missing"
+    else:
+        if not re.fullmatch(r"[ \t\r\n]*\+?[ \t\r\n]*", gap or ""):
+            return None, "gap-not-allowed"
+
+    # Continue existing exclusion & dedupe logic
+    target = nxt["username"]
+    if not target:
+        return None, "empty-target"
     
-    # Check gap between @bot and next mention
-    text = tweet.get("text", "")
-    gap = text[typed[i]["end"]:nxt["start"]]
-
-    # Allow whitespace or optional single '+' between @bot and target
-    if not re.fullmatch(r"[ \t\r\n]*\+?[ \t\r\n]*", gap or ""):
-        return None, "gap-not-allowed"
-
     # Build exclusions (bot, author, reply-to user)
     excludes = _exclusions(tweet, bot_handle_lc, author_id)
     if in_reply_to_user_id:
@@ -155,18 +164,15 @@ def extract_target_after_last_bot(
                          for u in includes_users if u.get("id") and u.get("username")}
         if in_reply_to_user_id in id_to_username:
             excludes.add(id_to_username[in_reply_to_user_id])
-
-    target = nxt["username"]
-    if not target:
-        return None, "empty-target"
+    
     if target in excludes:
         return None, "excluded-target"
 
-    # Light dedupe info for telemetry
     dedup = (i + 2 < len(typed) and typed[i + 2]["username"] == target)
-    reason = "immediate after last @bot"
+    reason = ("immediate after last @bot (require-plus)" if require_plus else "immediate after last @bot")
     if dedup:
         reason += " (dedup)"
+
     return target, reason
 
 def normalize_pfp_url(url: str) -> str:
