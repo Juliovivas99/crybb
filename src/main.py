@@ -52,6 +52,11 @@ class CryBBBot:
         self.storage = Storage()
         print("✓ Storage created")
         
+        # Clean up any stale processing locks from previous runs
+        print("Cleaning up stale processing locks...")
+        self.storage.cleanup_stale_processing_locks()
+        print("✓ Stale processing locks cleaned up")
+        
         print("Creating user limiter...")
         self.user_limiter = PerUserLimiter(Config.PER_TARGET_HOURLY_LIMIT, 3600)
         print("✓ User limiter created")
@@ -474,13 +479,28 @@ class CryBBBot:
                             print(f"[SKIP] Tweet {tid} already processed in previous run")
                             continue
                         
+                        # Check if tweet is currently being processed by another instance
+                        if self.storage.is_processing(tid):
+                            print(f"[SKIP] Tweet {tid} is currently being processed by another instance")
+                            continue
+                        
+                        # Acquire processing lock to prevent concurrent processing
+                        if not self.storage.acquire_processing_lock(tid):
+                            print(f"[SKIP] Tweet {tid} processing lock could not be acquired")
+                            continue
+                        
                         try:
                             # ---- your existing routing (AI vs overlay vs text rules) is inside process_mention() ----
                             print(f"[PROCESSING] Starting processing for tweet {tid}")
                             self.process_mention(m, ctx)
-                            self.storage.mark_processed(tid)
-                            success_ids.add(tid)
-                            print(f"✅ Processed {tid}")
+                            
+                            # Only mark as processed if processing was successful
+                            if self.storage.mark_processed(tid):
+                                success_ids.add(tid)
+                                print(f"✅ Processed {tid}")
+                            else:
+                                print(f"⚠️ Tweet {tid} was already processed by another instance")
+                                
                         except Exception as e:
                             print(f"❌ Failed {tid}: {e}")
                             # Try a text-only fallback reply ONCE.
@@ -489,13 +509,18 @@ class CryBBBot:
                                     in_reply_to=tid,
                                     text="Sorry — I couldn't render that one. Try again in a bit! 💛"
                                 )
-                                self.storage.mark_processed(tid)
-                                success_ids.add(tid)
-                                print(f"📝 Sent fallback text for {tid}")
+                                if self.storage.mark_processed(tid):
+                                    success_ids.add(tid)
+                                    print(f"📝 Sent fallback text for {tid}")
+                                else:
+                                    print(f"⚠️ Tweet {tid} was already processed by another instance")
                             except Exception as e2:
                                 print(f"⚠️ Fallback also failed for {tid}: {e2}")
                                 failed_ids.append(tid)
                                 # leave unmarked so it retries next poll
+                        finally:
+                            # Always release the processing lock
+                            self.storage.release_processing_lock(tid)
                     
                     # Advance since_id only to last *contiguous* success from the oldest.
                     prefix_last = last_contiguous_success(oldest_first)

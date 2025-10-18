@@ -4,6 +4,8 @@ Simple storage for persisting since_id and processed tweet IDs across runs.
 import json
 import os
 import time
+import fcntl
+import threading
 from typing import Optional, Set, Dict, Tuple
 from src.config import Config
 
@@ -22,6 +24,9 @@ class Storage:
         self._conversation_cache: Dict[Tuple[str, str], float] = {}
         self._conversation_cache_ttl = 45 * 60  # 45 minutes
         self._load_conversation_cache()
+        
+        # Thread lock for file operations
+        self._file_lock = threading.Lock()
     
     def read_since_id(self) -> Optional[str]:
         """Read since_id from storage file."""
@@ -59,24 +64,160 @@ class Storage:
         
         return set()
     
-    def mark_processed(self, tweet_id: str) -> None:
-        """Atomically mark a tweet as processed."""
-        try:
-            os.makedirs(os.path.dirname(self.processed_ids_file), exist_ok=True)
-            current = self.read_processed_ids()
-            if tweet_id in current:
-                return
-            current.add(tweet_id)
-            tmp = f"{self.processed_ids_file}.tmp"
-            with open(tmp, "w") as f:
-                json.dump({"processed_ids": sorted(list(current))}, f, indent=2)
-            os.replace(tmp, self.processed_ids_file)  # atomic on POSIX
-        except Exception as e:
-            print(f"Error marking {tweet_id} processed: {e}")
+    def mark_processed(self, tweet_id: str) -> bool:
+        """
+        Atomically mark a tweet as processed.
+        
+        Args:
+            tweet_id: The tweet ID to mark as processed
+            
+        Returns:
+            bool: True if successfully marked as processed, False if already processed
+        """
+        with self._file_lock:
+            try:
+                os.makedirs(os.path.dirname(self.processed_ids_file), exist_ok=True)
+                
+                # Use file locking for atomic read-modify-write
+                lock_file_path = f"{self.processed_ids_file}.lock"
+                
+                with open(lock_file_path, 'w') as lock_file:
+                    # Acquire exclusive file lock
+                    fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
+                    
+                    try:
+                        # Read current processed IDs
+                        current = set()
+                        if os.path.exists(self.processed_ids_file):
+                            with open(self.processed_ids_file, "r") as f:
+                                data = json.load(f)
+                                current = set(data.get("processed_ids", []))
+                        
+                        # Check if already processed
+                        if tweet_id in current:
+                            return False  # Already processed
+                        
+                        # Add new tweet ID
+                        current.add(tweet_id)
+                        
+                        # Write atomically using temp file + rename
+                        tmp_file = f"{self.processed_ids_file}.tmp"
+                        with open(tmp_file, "w") as f:
+                            json.dump({"processed_ids": sorted(list(current))}, f, indent=2)
+                        
+                        # Atomic rename (POSIX guarantee)
+                        os.replace(tmp_file, self.processed_ids_file)
+                        
+                        return True  # Successfully marked as processed
+                        
+                    finally:
+                        # Release file lock
+                        fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
+                        
+            except Exception as e:
+                print(f"Error marking {tweet_id} processed: {e}")
+                return False
+            finally:
+                # Clean up lock file
+                try:
+                    if os.path.exists(lock_file_path):
+                        os.remove(lock_file_path)
+                except:
+                    pass
     
     def is_processed(self, tweet_id: str) -> bool:
         """Check if a tweet ID has been processed."""
         return tweet_id in self.read_processed_ids()
+    
+    def is_processing(self, tweet_id: str) -> bool:
+        """
+        Check if a tweet is currently being processed by checking for a processing lock file.
+        
+        Args:
+            tweet_id: The tweet ID to check
+            
+        Returns:
+            bool: True if tweet is currently being processed, False otherwise
+        """
+        processing_lock_file = os.path.join(Config.OUTBOX_DIR, f"processing_{tweet_id}.lock")
+        return os.path.exists(processing_lock_file)
+    
+    def acquire_processing_lock(self, tweet_id: str) -> bool:
+        """
+        Acquire a processing lock for a tweet to prevent concurrent processing.
+        
+        Args:
+            tweet_id: The tweet ID to acquire lock for
+            
+        Returns:
+            bool: True if lock acquired successfully, False if already being processed
+        """
+        processing_lock_file = os.path.join(Config.OUTBOX_DIR, f"processing_{tweet_id}.lock")
+        
+        try:
+            # Check if already being processed
+            if os.path.exists(processing_lock_file):
+                return False
+            
+            # Create processing lock file
+            os.makedirs(os.path.dirname(processing_lock_file), exist_ok=True)
+            with open(processing_lock_file, 'w') as f:
+                f.write(str(time.time()))  # Write timestamp for debugging
+            return True
+            
+        except Exception as e:
+            print(f"Error acquiring processing lock for {tweet_id}: {e}")
+            return False
+    
+    def release_processing_lock(self, tweet_id: str) -> None:
+        """
+        Release a processing lock for a tweet.
+        
+        Args:
+            tweet_id: The tweet ID to release lock for
+        """
+        processing_lock_file = os.path.join(Config.OUTBOX_DIR, f"processing_{tweet_id}.lock")
+        
+        try:
+            if os.path.exists(processing_lock_file):
+                os.remove(processing_lock_file)
+        except Exception as e:
+            print(f"Error releasing processing lock for {tweet_id}: {e}")
+    
+    def cleanup_stale_processing_locks(self, max_age_seconds: int = 300) -> None:
+        """
+        Clean up stale processing lock files that may have been left behind by crashed processes.
+        
+        Args:
+            max_age_seconds: Maximum age in seconds for processing locks (default 5 minutes)
+        """
+        try:
+            outbox_dir = Config.OUTBOX_DIR
+            if not os.path.exists(outbox_dir):
+                return
+            
+            current_time = time.time()
+            cleaned_count = 0
+            
+            for filename in os.listdir(outbox_dir):
+                if filename.startswith("processing_") and filename.endswith(".lock"):
+                    lock_file_path = os.path.join(outbox_dir, filename)
+                    
+                    try:
+                        # Check file age
+                        file_age = current_time - os.path.getmtime(lock_file_path)
+                        if file_age > max_age_seconds:
+                            os.remove(lock_file_path)
+                            cleaned_count += 1
+                            print(f"Cleaned up stale processing lock: {filename}")
+                    except Exception as e:
+                        print(f"Error cleaning up lock file {filename}: {e}")
+            
+            if cleaned_count > 0:
+                print(f"Cleaned up {cleaned_count} stale processing locks")
+                
+        except Exception as e:
+            print(f"Error during stale lock cleanup: {e}")
     
     def _load_conversation_cache(self) -> None:
         """Load conversation cache from file."""
