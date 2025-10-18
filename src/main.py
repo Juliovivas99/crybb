@@ -212,7 +212,7 @@ class CryBBBot:
                     else:
                         print("[PATTERN MATCHED] @bot only mention")
                 
-                if Config.DEBUG_MODE:
+                if Config.DEBUG_MENTIONS:
                     print(f"[MENTION DEBUG] Checking pattern: {tweet_text}")
                 target_username, reason = extract_target_after_last_bot(
                     tweet_data, bot_handle_lc, author_id, in_reply_to_user_id, len(typed)
@@ -220,7 +220,7 @@ class CryBBBot:
             
             # Enhanced debug logging with tweet validation
             author_username = (tweet_data.get('author') or {}).get('username') or ''
-            if Config.DEBUG_MODE:
+            if Config.DEBUG_MENTIONS:
                 print(f"[MENTION DEBUG] id={tweet_id} conv={conversation_id} reply_to={in_reply_to_user_id} "
                       f"author=@{author_username} target=@{target_username or 'None'} reason=\"{reason}\" "
                       f"text=\"{tweet_text}\" parent_author={parent_author_id}")
@@ -262,7 +262,7 @@ class CryBBBot:
             normalized_username = normalize(author_username) if author_username else ""
             is_whitelisted = normalized_username in Config.WHITELIST_HANDLES
             
-            if Config.DEBUG_MODE:
+            if Config.DEBUG_MENTIONS:
                 print(f"[DEBUG] Processing mention from user @{author_username}")
             
             # Additional validation
@@ -422,7 +422,7 @@ class CryBBBot:
                 users = includes.get("users", []) or []
                 
                 if mentions:
-                    if Config.DEBUG_MODE:
+                    if Config.DEBUG_MENTIONS:
                         print(f"Found {len(mentions)} mentions")
                     
                     # Build batch snapshot from includes.users
@@ -433,7 +433,7 @@ class CryBBBot:
                     }
                     
                     ctx = ProcessingContext(batch_users=batch_users)
-                    if Config.DEBUG_MODE:
+                    if Config.DEBUG_MENTIONS:
                         print(f"Built batch snapshot: users={len(batch_users)}")
                     
                     # Process mentions with contiguous success tracking
@@ -478,7 +478,7 @@ class CryBBBot:
                             success_ids.add(tid)
                     
                     # Log every mention retrieved from Twitter API
-                    if Config.DEBUG_MODE:
+                    if Config.DEBUG_MENTIONS:
                         print(f"[BATCH DEBUG] Retrieved {len(oldest_first)} mentions from Twitter API")
                         for i, m in enumerate(oldest_first):
                             tid = m["id"]
