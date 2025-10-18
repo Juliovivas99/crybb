@@ -442,19 +442,34 @@ class CryBBBot:
                     success_ids: set[str] = set()
                     failed_ids: list[str] = []
                     
-                    def last_contiguous_success(seq):
+                    def highest_processed_id(seq):
                         """
-                        Return the last tweet_id of the contiguous success prefix from the oldest.
-                        A 'success' means the tweet_id is in success_ids (including already processed).
+                        Return the highest tweet_id that was processed (successfully or not) in the batch.
+                        This allows since_id to advance past failed tweets to continue processing newer ones.
                         """
-                        last = None
+                        highest = None
+                        processed_ids = set()
+                        
+                        # Include already processed tweets
                         for m in seq:
                             tid = m["id"]
-                            if tid in success_ids:
-                                last = tid
-                            else:
-                                break
-                        return last
+                            if self.storage.is_processed(tid):
+                                processed_ids.add(tid)
+                                if highest is None or tid > highest:
+                                    highest = tid
+                        
+                        # Include tweets processed in this batch (success or failure)
+                        for tid in success_ids:
+                            processed_ids.add(tid)
+                            if highest is None or tid > highest:
+                                highest = tid
+                        
+                        for tid in failed_ids:
+                            processed_ids.add(tid)
+                            if highest is None or tid > highest:
+                                highest = tid
+                        
+                        return highest
                     
                     # Count already-processed as success so they contribute to the prefix.
                     for m in oldest_first:
@@ -517,18 +532,28 @@ class CryBBBot:
                             except Exception as e2:
                                 print(f"⚠️ Fallback also failed for {tid}: {e2}")
                                 failed_ids.append(tid)
-                                # leave unmarked so it retries next poll
+                                # Mark as processed to prevent infinite retry loops
+                                # since_id will still advance past this tweet
+                                if self.storage.mark_processed(tid):
+                                    print(f"📝 Marked failed tweet {tid} as processed to prevent retry loops")
+                                else:
+                                    print(f"⚠️ Failed tweet {tid} was already processed by another instance")
                         finally:
                             # Always release the processing lock
                             self.storage.release_processing_lock(tid)
                     
-                    # Advance since_id only to last *contiguous* success from the oldest.
-                    prefix_last = last_contiguous_success(oldest_first)
-                    if prefix_last:
+                    # Advance since_id to the highest tweet ID processed (successfully or not).
+                    # This allows the bot to continue processing newer tweets even if some older ones fail.
+                    highest_processed = highest_processed_id(oldest_first)
+                    if highest_processed:
                         prev = self.storage.read_since_id()
-                        if prefix_last != prev:
-                            self.storage.write_since_id(prefix_last)
-                            print(f"📝 since_id → {prefix_last}")
+                        if highest_processed != prev:
+                            self.storage.write_since_id(highest_processed)
+                            print(f"📝 since_id → {highest_processed} (advanced past {len(failed_ids)} failed tweets)")
+                        else:
+                            print(f"📝 since_id unchanged at {highest_processed} (no new tweets processed)")
+                    else:
+                        print(f"📝 since_id unchanged (no tweets processed in this batch)")
                     
                     if failed_ids:
                         print(f"⏳ Will retry next poll: {failed_ids}")
