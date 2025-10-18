@@ -120,6 +120,9 @@ class CryBBBot:
             conversation_id = tweet_data.get('conversation_id')
             in_reply_to_user_id = tweet_data.get('in_reply_to_user_id')
             
+            # Determine reply target: use conversation_id (root tweet) if available, otherwise tweet_id
+            reply_to_id = conversation_id if conversation_id else tweet_id
+            
             # CRITICAL FIX: Enhanced debug logging to show what we're actually processing
             author_username = (tweet_data.get('author') or {}).get('username') or 'unknown'
             print(f"[MENTION PROCESSING] Processing tweet_id={tweet_id} author=@{author_username} text=\"{tweet_text}\"")
@@ -240,7 +243,7 @@ class CryBBBot:
             if not self.rate_limiter.allow(author_id, author_username):
                 print(f"Rate limit exceeded for user {author_username or author_id}")
                 self.twitter_client.reply_with_image(
-                    tweet_id,
+                    reply_to_id,
                     format_rate_limit_message(),
                     self._create_error_image()
                 )
@@ -280,7 +283,7 @@ class CryBBBot:
             if not target_user_data:
                 print(f"Could not fetch user @{target_username}")
                 self.twitter_client.reply_with_image(
-                    tweet_id,
+                    reply_to_id,
                     format_error_message(),
                     self._create_error_image()
                 )
@@ -297,7 +300,7 @@ class CryBBBot:
             if not pfp_url:
                 print(f"No profile image URL for @{target_username}")
                 self.twitter_client.reply_with_image(
-                    tweet_id,
+                    reply_to_id,
                     format_error_message(),
                     self._create_error_image()
                 )
@@ -315,7 +318,6 @@ class CryBBBot:
             
             # Reply with processed image
             reply_text = format_friendly_message(target_username)
-            reply_to_id = conversation_id if conversation_id else tweet_id
             
             # Enhanced logging to show reply target decision
             if conversation_id and conversation_id != tweet_id:
@@ -347,8 +349,10 @@ class CryBBBot:
         except Exception as e:
             print(f"Error processing mention {tweet_data.get('id', 'unknown')}: {e}")
             try:
+                # Use conversation_id if available, otherwise tweet_id
+                error_reply_to_id = tweet_data.get('conversation_id') or tweet_data.get('id', '')
                 self.twitter_client.reply_with_image(
-                    tweet_data.get('id', ''),
+                    error_reply_to_id,
                     format_error_message(),
                     self._create_error_image()
                 )
