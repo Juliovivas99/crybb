@@ -18,12 +18,17 @@ class Storage:
         self.storage_file = os.path.join(Config.OUTBOX_DIR, "since_id.json")
         self.processed_ids_file = os.path.join(Config.OUTBOX_DIR, "processed_ids.json")
         self.conversation_cache_file = os.path.join(Config.OUTBOX_DIR, "conversation_cache.json")
+        self.processed_conversations_file = os.path.join(Config.OUTBOX_DIR, "processed_conversations.json")
         os.makedirs(Config.OUTBOX_DIR, exist_ok=True)
         
         # In-memory conversation cache with TTL
         self._conversation_cache: Dict[Tuple[str, str], float] = {}
         self._conversation_cache_ttl = 45 * 60  # 45 minutes
         self._load_conversation_cache()
+        
+        # In-memory processed conversations set for conversation-level deduplication
+        self._processed_conversations: Set[str] = set()
+        self._load_processed_conversations()
         
         # Thread lock for file operations
         self._file_lock = threading.Lock()
@@ -290,6 +295,48 @@ class Storage:
         key = (conversation_id, target_username.lower())
         self._conversation_cache[key] = time.time()
         self._save_conversation_cache()
+    
+    def _load_processed_conversations(self) -> None:
+        """Load processed conversations from file."""
+        try:
+            if os.path.exists(self.processed_conversations_file):
+                with open(self.processed_conversations_file, "r") as f:
+                    data = json.load(f)
+                    self._processed_conversations = set(data.get("processed_conversations", []))
+        except Exception as e:
+            print(f"Error loading processed conversations: {e}")
+    
+    def _save_processed_conversations(self) -> None:
+        """Save processed conversations to file."""
+        try:
+            tmp = f"{self.processed_conversations_file}.tmp"
+            with open(tmp, "w") as f:
+                json.dump({"processed_conversations": sorted(list(self._processed_conversations))}, f, indent=2)
+            os.replace(tmp, self.processed_conversations_file)  # atomic on POSIX
+        except Exception as e:
+            print(f"Error saving processed conversations: {e}")
+    
+    def is_conversation_processed(self, conversation_id: str) -> bool:
+        """
+        Check if a conversation has already been processed.
+        
+        Args:
+            conversation_id: The conversation ID to check
+            
+        Returns:
+            bool: True if conversation has been processed, False otherwise
+        """
+        return conversation_id in self._processed_conversations
+    
+    def mark_conversation_processed(self, conversation_id: str) -> None:
+        """
+        Mark a conversation as processed.
+        
+        Args:
+            conversation_id: The conversation ID to mark as processed
+        """
+        self._processed_conversations.add(conversation_id)
+        self._save_processed_conversations()
 
 
 

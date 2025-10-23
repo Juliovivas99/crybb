@@ -125,8 +125,8 @@ class CryBBBot:
             conversation_id = tweet_data.get('conversation_id')
             in_reply_to_user_id = tweet_data.get('in_reply_to_user_id')
             
-            # Determine reply target: use conversation_id (root tweet) if available, otherwise tweet_id
-            reply_to_id = conversation_id if conversation_id else tweet_id
+            # Determine reply target: always reply to the specific tweet that mentioned the bot
+            reply_to_id = tweet_id
             
             # CRITICAL FIX: Enhanced debug logging to show what we're actually processing
             author_username = (tweet_data.get('author') or {}).get('username') or 'unknown'
@@ -271,7 +271,12 @@ class CryBBBot:
                 print("[SKIP] Target is bot handle")
                 return
             
-            # Conversation de-dupe check
+            # Conversation-level deduplication check (prevents multiple replies to same conversation)
+            if conversation_id and self.storage.is_conversation_processed(conversation_id):
+                print(f"[SKIP] conversation-dedupe: conversation {conversation_id} already processed, skipping duplicate")
+                return
+            
+            # Target-specific conversation de-dupe check (existing functionality)
             if conversation_id and self.storage.check_conversation_dedupe(conversation_id, target_username):
                 print(f"[SKIP] conv-dedupe: already processed {conversation_id} -> @{target_username} recently")
                 return
@@ -325,15 +330,20 @@ class CryBBBot:
             reply_text = format_friendly_message(target_username)
             
             # Enhanced logging to show reply target decision
+            print(f"[REPLY STRATEGY] Replying to tweet_id {tweet_id} (specific mention tweet)")
             if conversation_id and conversation_id != tweet_id:
-                print(f"[REPLY STRATEGY] Using conversation_id {conversation_id} (root tweet) instead of tweet_id {tweet_id} (intermediate reply)")
-                print(f"[REPLY STRATEGY] This ensures the reply appears directly under the original tweet")
+                print(f"[REPLY STRATEGY] This creates proper threading while maintaining visibility in conversation {conversation_id}")
             else:
-                print(f"[REPLY STRATEGY] Using tweet_id {tweet_id} (no conversation or same as root)")
+                print(f"[REPLY STRATEGY] Standalone tweet - no conversation threading needed")
 
             reply_result = self.twitter_client.reply_with_image(reply_to_id, reply_text, image_bytes)
             
-            # Record conversation de-dupe after successful reply
+            # Record conversation-level deduplication after successful reply
+            if conversation_id:
+                self.storage.mark_conversation_processed(conversation_id)
+                print(f"[CONVERSATION MARKED] conversation {conversation_id} marked as processed")
+            
+            # Record target-specific conversation de-dupe after successful reply (existing functionality)
             if conversation_id:
                 self.storage.record_conversation_dedupe(conversation_id, target_username)
             
