@@ -198,7 +198,7 @@ def main() -> int:
 
     # 6) TWEET BUILD (dry-run)
     in_reply_to = tweets[0].id if tweets else 1234567890
-    text = f"Welcome to $CRYBB @{target_info['username']} 🍼\n\nNO CRYING IN THE CASINO." if target_info else "Welcome to $CRYBB 🍼\n\nNO CRYING IN THE CASINO."
+    text = ""  # No text content to avoid repetitive content detection
     ok, payload, msg = build_tweet_payload(in_reply_to, text, media_id if ok else None)
     print_line("TWEET BUILD", ok, "payload built" if ok else msg)
 

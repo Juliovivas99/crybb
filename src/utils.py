@@ -219,18 +219,18 @@ def extract_target_username(text: str, bot_handle: str) -> Optional[str]:
 
 def format_friendly_message(target_username: Optional[str] = None) -> str:
     """Format a friendly reply message."""
-    if target_username:
-        return f"Welcome to $CRYBB @{target_username} 🍼\n\nNO CRYING IN THE CASINO."
-    else:
-        return "Welcome to $CRYBB 🍼\n\nNO CRYING IN THE CASINO."
+    # Return empty string to avoid repetitive content detection
+    return ""
 
 def format_rate_limit_message() -> str:
     """Format a friendly rate limit message."""
-    return "Hey! I'm getting a bit overwhelmed 😅 Please wait a bit before requesting another CryBB PFP!"
+    # Return empty string to avoid repetitive content detection
+    return ""
 
 def format_error_message() -> str:
     """Format a friendly error message."""
-    return "Oops! Something went wrong while processing your request. Please try again later! 🙏"
+    # Return empty string to avoid repetitive content detection
+    return ""
 
 
 
